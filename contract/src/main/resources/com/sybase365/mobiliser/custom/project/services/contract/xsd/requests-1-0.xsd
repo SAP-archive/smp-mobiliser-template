@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<xs:schema version="1.0"
+  targetNamespace="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0"
+  xmlns="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0"
+  xmlns:beans="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0/beans"
+  xmlns:base="http://mobiliser.sybase365.com/framework/contract/v5_0/base"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+  xmlns:xyz="http://mobiliser.sybase365.com/money/contract/v5_0/customer/beans"
+  xmlns:trans="http://mobiliser.sybase365.com/money/contract/v5_0/transaction"
+  jxb:extensionBindingPrefixes="xjc" jxb:version="2.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jxb:schemaBindings>
+        <jxb:package
+          name="com.sybase365.mobiliser.custom.project.services.contract.v1_0" />
+      </jxb:schemaBindings>
+    </xs:appinfo>
+    <xs:documentation>
+      <![CDATA[The XML Schema for mobiliser requests. Version:
+      $HeadURL$
+      ]]>
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import
+    namespace="http://mobiliser.sybase365.com/framework/contract/v5_0/base"
+    schemaLocation="../../../../../framework/contract/xsd/base-5-0.xsd" />
+  <xs:import
+    namespace="http://mobiliser.sybase365.com/money/contract/v5_0/transaction"
+    schemaLocation="../../../../../money/contract/transaction/xsd/requests-5-0.xsd" />
+
+  <xs:import schemaLocation="../../../../../money/contract/customer/xsd/beans-5-0.xsd"
+    namespace="http://mobiliser.sybase365.com/money/contract/v5_0/customer/beans"></xs:import>
+
+  <xs:import
+    namespace="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0/beans"
+    schemaLocation="beans-1-0.xsd" />
+
+  <!-- ########################################### -->
+  <!-- ########### blacklist operations ########## -->
+  <!-- ########################################### -->
+
+  <!-- this file contains types and elements for all operation on the BlackLit 
+    entity -->
+
+  <!-- ########################################### -->
+  <!-- ############# CRUD operations ############# -->
+  <!-- ########################################### -->
+
+  <xs:complexType name="CreateBlacklistRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a new Blacklist id with the provided data.
+        It
+        returns the newly created blackList with the blackList ID filled.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blacklist" type="beans:Blacklist" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CreateBlacklistResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="blacklistId" type="base:idLong" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CreateBlacklistRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="CreateBlacklistRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateBlacklistResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="CreateBlacklistResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### get blackList ######### -->
+  <xs:complexType name="GetBlacklistRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Retrieves the a BlackList by the BlackList ID. This
+        service is not likely to be called. The only useful query method is
+        the FindBlackListByName which already returns full BlackList
+        entities.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserRequestType">
+        <xs:sequence>
+          <xs:element name="blacklistId" type="base:idLong" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBlacklistResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="blacklist" type="beans:Blacklist" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetBlacklistRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetBlacklistRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetBlacklistResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetBlacklistResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### update blackList ######### -->
+  <xs:complexType name="UpdateBlacklistRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Updates all provided blacklist data except for the
+        BlackList id.
+        In order for this service to function properly the
+        ID of
+        the Blacklist to update has to set.
+        If this is not the case an
+        exception will be thrown.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blackList" type="beans:Blacklist" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UpdateBlacklistResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="UpdateBlacklistRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="UpdateBlacklistRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateBlacklistResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="UpdateBlacklistResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### delete blackList ######### -->
+  <xs:complexType name="DeleteBlacklistRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        This services removes a Blacklist from the
+        database.
+        If no BlackList was found for the provided ID an
+        exception
+        will be thrown.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blacklistId" type="base:idLong" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteBlacklistResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="DeleteBlacklistRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="DeleteBlacklistRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteBlacklistResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="DeleteBlacklistResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- ########################################### -->
+  <!-- ############# Custom operations ########### -->
+  <!-- ########################################### -->
+
+  <xs:complexType name="FindBlacklistByNameRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Finds all Blacklist records that have a 100 percent
+        match on the name.
+        The List of entities is returned and can be
+        updated or deleted based
+        on the id.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="name" type="base:strLarge" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FindBlacklistByNameResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="blacklist" type="beans:Blacklist" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="FindBlacklistByNameRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="FindBlacklistByNameRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FindBlacklistByNameResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="FindBlacklistByNameResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+
+
+  <!-- ########################################### -->
+  <!-- ############# CRUD operations ############# -->
+  <!-- ########################################### -->
+
+  <xs:complexType name="CreateBlacklistTypeRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a new Blacklist type with the provided
+        data.
+        It
+        returns the newly created blackList typewith the blackList ID
+        filled.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blacklistType" type="beans:BlacklistType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CreateBlacklistTypeResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CreateBlacklistTypeRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="CreateBlacklistTypeRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateBlacklistTypeResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="CreateBlacklistTypeResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### get blackList ######### -->
+  <xs:complexType name="GetBlacklistTypeRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Retrieves the a BlackList type by the BlackList
+        type ID. This
+        service is not likely to be called. The only useful
+        query method is
+        the FindBlackListByName which already returns full
+        BlackList entities.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserRequestType">
+        <xs:sequence>
+          <xs:element name="blacklistTypeId" type="base:idShort" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBlacklistTypeResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="blacklistType" type="beans:BlacklistType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetBlacklistTypeRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetBlacklistTypeRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetBlacklistTypeResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetBlacklistTypeResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### update blackList ######### -->
+  <xs:complexType name="UpdateBlacklistTypeRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        Updates all provided blacklist type data except for
+        the
+        BlackList id.
+        In order for this service to function properly the
+        ID of the Blacklist to update has to set.
+        If this is not the case an
+        exception will be thrown.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blackListType" type="beans:BlacklistType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UpdateBlacklistTypeResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="UpdateBlacklistTypeRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="UpdateBlacklistTypeRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateBlacklistTypeResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="UpdateBlacklistTypeResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ######### delete blackList ######### -->
+  <xs:complexType name="DeleteBlacklistTypeRequestType">
+    <xs:annotation>
+      <xs:documentation>
+        This services removes a Blacklist from the
+        database.
+        If no BlackList was found for the provided ID an
+        exception
+        will be thrown.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base:TraceableRequestType">
+        <xs:sequence>
+          <xs:element name="blacklistTypeId" type="base:idShort" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteBlacklistTypeResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="DeleteBlacklistTypeRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="DeleteBlacklistTypeRequestType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteBlacklistTypeResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="DeleteBlacklistTypeResponseType" />
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="GetWeatherRequestType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserRequestType">
+        <xs:sequence>
+          <xs:element name="zip" type="base:strMediumNonEmpty" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetWeatherResponseType">
+    <xs:complexContent>
+      <xs:extension base="base:MobiliserResponseType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="weather" type="base:strLarge" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetWeatherRequest">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetWeatherRequestType"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetWeatherResponse">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="GetWeatherResponseType"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
+

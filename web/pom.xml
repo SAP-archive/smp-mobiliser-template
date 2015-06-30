@@ -1,0 +1,734 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+    <artifactId>com.sybase365.mobiliser.custom.project</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+  <artifactId>com.sybase365.mobiliser.custom.project.web</artifactId>
+  <name>AIMS Mobiliser :: Custom :: Project Web UI</name>
+  <packaging>war</packaging>
+
+  <properties>
+
+    <manifest.title>Sybase365 Mobiliser - Unified Web Application</manifest.title>
+    <maven.test.skip>false</maven.test.skip>
+    <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+
+    <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+    <!-- workaround to use in resource filtering -->
+    <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
+
+    <!-- the following are supplied by jenkins -->
+    <buildTag>${BUILD_TAG}</buildTag>
+    <buildRevision>${SVN_REVISION}</buildRevision>
+
+  </properties>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/main/webapp/html</directory>
+      </testResource>
+    </testResources>
+
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <additionalClasspathElements>
+              <additionalClasspathElement>${basedir}/src/main/webapp/js</additionalClasspathElement>
+              <additionalClasspathElement>${basedir}/src/main/webapp/xml</additionalClasspathElement>
+              <additionalClasspathElement>${basedir}/src/test/resources</additionalClasspathElement>
+            </additionalClasspathElements>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/com/sybase365/mobiliser/web/application</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/com/sybase365/mobiliser/web/application</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <downloadSources>true</downloadSources>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.sun.tools.xjc.maven2</groupId>
+        <artifactId>maven-jaxb-plugin</artifactId>
+        <executions>
+          <!-- generate the files. -->
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includeSchemas>
+            <includeSchema>**/*.xsd</includeSchema>
+          </includeSchemas>
+          <verbose>true</verbose>
+          <extension>true</extension>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <overlays>
+            <overlay>
+              <groupId>com.sap.mobile.platform.server.appservices.money.web</groupId>
+              <artifactId>com.sybase365.mobiliser.ui.web.application</artifactId>
+              <includes>
+                <include>META-INF/context.xml</include>
+                <include>WEB-INF/lib/com.sybase365.mobiliser*.jar</include>
+                <include>WEB-INF/lib/kaptcha-*.jar</include>
+              </includes>
+            </overlay>
+          </overlays>
+          <warName>portal</warName>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.web</groupId>
+      <artifactId>com.sybase365.mobiliser.ui.web.application</artifactId>
+      <version>${version.smp-portal-war}</version>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-xc</artifactId>
+      <version>1.9.7</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.6.12</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <version>3.1.3.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>3.1.3.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>3.1.3.RELEASE</version>
+    </dependency>
+
+    <!-- WICKET DEPENDENCIES -->
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket</artifactId>
+      <version>${version.wicket}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-extensions</artifactId>
+      <version>${version.wicket}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-auth-roles</artifactId>
+      <version>${version.wicket}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.wicketstuff</groupId>
+      <artifactId>jwicket-ui-datepicker</artifactId>
+      <version>1.4.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.wicketstuff</groupId>
+      <artifactId>inmethod-grid</artifactId>
+      <version>1.4.21</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-jmx</artifactId>
+      <version>${version.wicket}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-datetime</artifactId>
+      <version>${version.wicket}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-spring</artifactId>
+      <version>${version.wicket}</version>
+      <!-- exclude spring framework that wicket pulls in -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.web</groupId>
+      <artifactId>com.sybase365.mobiliser.ui.web.wicketutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/portalwar/WEB-INF/lib/com.sybase365.mobiliser.ui.web.wicketutils-${version.web}.jar</systemPath>
+    </dependency>
+
+    <!-- LOGGING DEPENDENCIES - LOG4J -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <!-- JUNIT DEPENDENCY FOR TESTING -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <!-- SPRING STUFF -->
+    <dependency>
+      <groupId>org.springframework.ws</groupId>
+      <artifactId>spring-ws-core</artifactId>
+      <version>2.1.1.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>3.1.4.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-oxm</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-expression</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.ws</groupId>
+      <artifactId>spring-xml</artifactId>
+      <version>2.1.1.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>3.1.4.RELEASE</version>
+    </dependency>
+
+    <!-- H2 Database for Operations Dashboad data storage -->
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.3.169</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- EHCACHE DEPENDENCIES -->
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <version>1.3.3</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>geronimo-jms_1.1_spec</artifactId>
+          <groupId>org.apache.geronimo.specs</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+          <groupId>org.apache.geronimo.specs</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+      <artifactId>ehcache-spring-annotations</artifactId>
+      <version>1.2.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-asm</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-expression</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>aopalliance</artifactId>
+          <groupId>aopalliance</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+
+    <!-- MOBILISER DEPENDENCIES -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.contract-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.audit</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.audit-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.customer</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.customer-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.moneycustomer</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.moneycustomer-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.system</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.system-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.wallet</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.wallet-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.transaction</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.transaction-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.invoice</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.invoice-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.contract.ping</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.contract.ping-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.service.contract-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.coupon.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.coupon.service.contract-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.encryptionutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.encryptionutils-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.services.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.services.api-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.service.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.service.api-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.management</groupId>
+      <artifactId>com.sybase365.mobiliser.util.management.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/21-mobiliser-management-services/com.sybase365.mobiliser.util.management.service.contract-${version.management}.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.formatutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.formatutils-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.dateutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.dateutils-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.mathutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.mathutils-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.clientutils.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.tools.clientutils.api-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.clientutils.soap</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.tools.clientutils.soap-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.clientutils.rest</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.tools.clientutils.rest-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+
+    <!-- MBANKING DEPENDENCIES -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.mbanking</groupId>
+      <artifactId>com.sybase365.mobiliser.mbanking.services.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/23-mobiliser-mbanking-businesslogic-services/com.sybase365.mobiliser.mbanking.services.contract-${version.mbanking}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.mbanking</groupId>
+      <artifactId>com.sybase365.mobiliser.mbanking.services.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/23-mobiliser-mbanking-businesslogic-services/com.sybase365.mobiliser.mbanking.services.api-${version.mbanking}.jar</systemPath>
+    </dependency>
+
+    <!-- ALERTS DEPENDENCIES -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.alerts.services.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/22-mobiliser-alert/com.sybase365.mobiliser.money.alerts.services.contract-${version.money}.jar</systemPath>
+    </dependency>
+
+    <!-- SERVICE PACKAGE -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.svcpkg.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.svcpkg.service.contract-${version.money}.jar</systemPath>
+    </dependency>
+    <!-- PREFERENCES DEPENDENCIES -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.contract-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.api-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.impl</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.impl-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.store.remote</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.prefs.store.remote-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.util</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.util-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.encryption.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.encryption.api-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.service.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.service.api-${version.prefs}.jar</systemPath>
+    </dependency>
+
+    <!-- Report Service -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.reports</groupId>
+      <artifactId>com.sybase365.mobiliser.util.report.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/19-mobiliser-reports-api/com.sybase365.mobiliser.util.report.api-${version.reports}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.reports</groupId>
+      <artifactId>com.sybase365.mobiliser.util.report.service.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/20-mobiliser-reports-services/com.sybase365.mobiliser.util.report.service.api-${version.reports}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.reports</groupId>
+      <artifactId>com.sybase365.mobiliser.util.report.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/20-mobiliser-reports-services/com.sybase365.mobiliser.util.report.service.contract-${version.reports}.jar</systemPath>
+    </dependency>
+
+    <!-- Version parsing -->
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Captcha Service -->
+    <dependency>
+      <groupId>com.google.code.download.kaptcha</groupId>
+      <artifactId>kaptcha</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/portalwar/WEB-INF/lib/kaptcha-2.3.2.jar</systemPath>
+    </dependency>
+  </dependencies>
+
+</project>

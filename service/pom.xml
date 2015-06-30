@@ -1,0 +1,1008 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>com.sybase365.mobiliser.custom.project</artifactId>
+    <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+  <packaging>bundle</packaging>
+  <name>AIMS Mobiliser :: Custom :: Project Service</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>1.12</version>
+        <executions>
+          <execution>
+            <id>weather</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <configuration>
+              <wsdlDirectory>src/main/resources</wsdlDirectory>
+              <wsdlFiles>
+                <wsdlFile>Weather.wsdl</wsdlFile>
+              </wsdlFiles>
+              <keep>true</keep>
+              <debug>true</debug>
+              <xnocompile>true</xnocompile>
+              <staleFile>${project.build.directory}/jaxws/stale/.staleFlag_WeatherService</staleFile>
+              <wsdlLocation>/Weather.wsdl</wsdlLocation>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.jvnet.staxex</groupId>
+            <artifactId>stax-ex</artifactId>
+            <version>1.7.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <!-- Fix broken wsdl lookup in the generated service classes. -->
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <replace
+                  dir="${project.build.directory}/jaxws/wsimport/java/"
+                  token="&quot;.&quot;" value="&quot;&quot;">
+                  <include name="**/Weather.java"></include>
+                </replace>
+              </target>
+            </configuration>
+          </execution>
+          <!-- assemblies for script archives -->
+          <execution>
+            <id>copy-sql</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+
+                <mkdir dir="${basedir}/target/sql/anywhere/" />
+                <copy todir="${basedir}/target/sql/anywhere/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/ase/" />
+                <copy todir="${basedir}/target/sql/ase/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/db2/" />
+                <copy todir="${basedir}/target/sql/db2/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/derby/" />
+                <copy todir="${basedir}/target/sql/derby/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/hdb/" />
+                <copy todir="${basedir}/target/sql/hdb/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/mssql/" />
+                <copy todir="${basedir}/target/sql/mssql/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+                <mkdir dir="${basedir}/target/sql/oracle/" />
+                <copy todir="${basedir}/target/sql/oracle/">
+                  <fileset dir="${basedir}/src/main/schema/scripts/common" />
+                </copy>
+
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>patch-sql</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <!-- sequence expressions -->
+                <replaceregexp match="^(insert into .*?)#SEQ_VAL#(.*?)$"
+                  replace="declare @entity_id numeric(18)${line.separator}UPDATE SEQ_TABLE_HILO SET @entity_id = ID_SEQUENCE_NEXT_HI_VALUE, ID_SEQUENCE_NEXT_HI_VALUE = ID_SEQUENCE_NEXT_HI_VALUE + 1 WHERE STR_SEQUENCE_NAME = 'SEQ_ID_ENTITY'${line.separator}\1@entity_id\2${line.separator}"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="i">
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#SEQ_VAL#"
+                  replace="seq_id_entity.NEXTVAL" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#SEQ_VAL#"
+                  replace="( NEXT VALUE for SEQ_ID_ENTITY )" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/derby">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#SEQ_VAL#"
+                  replace="SEQ_ID_ENTITY.nextval" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#SEQ_VAL#"
+                  replace="SEQ_ID_ENTITY.NEXTVAL" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <!-- timestamp expressions -->
+                <replaceregexp match="#CURRENT_TIMESTAMP#"
+                  replace="getdate()" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_DATE#"
+                  replace="getdate()" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_START_DATE#"
+                  replace="DATEADD(dd, -1, getdate())" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_END_DATE#"
+                  replace="DATEADD(dd, 100, getdate())" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_TIMESTAMP_CREDENTIAL#"
+                  replace="DATEADD(dd, -90, getdate())" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/ase/">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql/">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <replaceregexp match="#CURRENT_TIMESTAMP#"
+                  replace="CURRENT TIMESTAMP" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_DATE#"
+                  replace="CURRENT DATE" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_START_DATE#"
+                  replace="CURRENT TIMESTAMP - (1 DAYS)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_END_DATE#"
+                  replace="CURRENT TIMESTAMP + (100 DAYS)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_TIMESTAMP_CREDENTIAL#"
+                  replace="CURRENT TIMESTAMP - (90 DAYS)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/db2">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <replaceregexp match="#CURRENT_TIMESTAMP#"
+                  replace="CURRENT_TIMESTAMP" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/derby">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_DATE#"
+                  replace="CURRENT_DATE" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/derby">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_START_DATE#"
+                  replace="{fn TIMESTAMPADD(SQL_TSI_DAY, -1, CURRENT_TIMESTAMP)}"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="ig">
+                  <fileset dir="${basedir}/target/sql/derby">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_END_DATE#"
+                  replace="{fn TIMESTAMPADD(SQL_TSI_DAY, 100, CURRENT_TIMESTAMP)}"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="ig">
+                  <fileset dir="${basedir}/target/sql/derby">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_TIMESTAMP_CREDENTIAL#"
+                  replace="{fn TIMESTAMPADD(SQL_TSI_DAY, -90, CURRENT_TIMESTAMP)}"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="i">
+                  <fileset dir="${basedir}/target/sql/derby/">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <replaceregexp match="#CURRENT_TIMESTAMP#"
+                  replace="SYSTIMESTAMP" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_DATE#"
+                  replace="SYSDATE" byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="ig">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_START_DATE#"
+                  replace="SYSTIMESTAMP - INTERVAL '1 00:00:00' DAY TO SECOND"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="ig">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_END_DATE#"
+                  replace="SYSTIMESTAMP + 100 * (INTERVAL '1 00:00:00' DAY TO SECOND)"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="ig">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_TIMESTAMP_CREDENTIAL#"
+                  replace="SYSTIMESTAMP - INTERVAL '90 00:00:00' DAY TO SECOND"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="i">
+                  <fileset dir="${basedir}/target/sql/oracle">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <replaceregexp match="#CURRENT_TIMESTAMP#"
+                  replace="CURRENT_TIMESTAMP" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_DATE#"
+                  replace="CURRENT_DATE" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_START_DATE#"
+                  replace="ADD_DAYS(CURRENT_TIMESTAMP, -1)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#COUPON_END_DATE#"
+                  replace="ADD_DAYS(CURRENT_TIMESTAMP, 100)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="ig">
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+                <replaceregexp match="#CURRENT_TIMESTAMP_CREDENTIAL#"
+                  replace="ADD_DAYS(CURRENT_TIMESTAMP, -90)" byline="true"
+                  preserveLastModified="true" encoding="${mobiliser.encoding}"
+                  flags="i">
+                  <fileset dir="${basedir}/target/sql/hdb">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+
+                <!-- change statement terminators for ANYWHERE/ASE/MSSQL -->
+                <replaceregexp match="^([^-].*);" replace="\1${line.separator}go"
+                  byline="true" preserveLastModified="true"
+                  encoding="${mobiliser.encoding}" flags="i">
+                  <fileset dir="${basedir}/target/sql/anywhere">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/ase">
+                    <include name="**/*.sql" />
+                  </fileset>
+                  <fileset dir="${basedir}/target/sql/mssql">
+                    <include name="**/*.sql" />
+                  </fileset>
+                </replaceregexp>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/db-derby.xml</descriptor>
+
+                <!-- CUSTOMISATION POINT - leave only the database variant you will be using here -->
+                <descriptor>src/main/assembly/db-anywhere.xml</descriptor>
+                <descriptor>src/main/assembly/db-ase.xml</descriptor>
+                <descriptor>src/main/assembly/db-db2.xml</descriptor>
+                <descriptor>src/main/assembly/db-hdb.xml</descriptor>
+                <descriptor>src/main/assembly/db-mssql.xml</descriptor>
+                <descriptor>src/main/assembly/db-oracle.xml</descriptor>
+                <!-- END CUSTOMISATION POINT - leave only the database variant you will be using above -->
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- instructions for bundle plugin -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Category>custom</Bundle-Category>
+            <Export-Package></Export-Package>
+            <Private-Package>
+              com.cdyne.ws.weatherws,
+              com.sybase365.mobiliser.custom.project.businesslogic,
+              com.sybase365.mobiliser.custom.project.businesslogic.configuration,
+              com.sybase365.mobiliser.custom.project.businesslogic.exceptions,
+              com.sybase365.mobiliser.custom.project.businesslogic.impl,
+              com.sybase365.mobiliser.custom.project.channels,
+              com.sybase365.mobiliser.custom.project.client,
+              com.sybase365.mobiliser.custom.project.converter,
+              com.sybase365.mobiliser.custom.project.converter.impl,
+              com.sybase365.mobiliser.custom.project.handlers.authentication,
+              com.sybase365.mobiliser.custom.project.handlers.billpayment,
+              com.sybase365.mobiliser.custom.project.handlers.exchangerate,
+              com.sybase365.mobiliser.custom.project.handlers.payment,
+              com.sybase365.mobiliser.custom.project.jobs.event.handler.blacklist,
+              com.sybase365.mobiliser.custom.project.jobs.event.model,
+              com.sybase365.mobiliser.custom.project.persistence.dao.api,
+              com.sybase365.mobiliser.custom.project.persistence.dao.factory.api,
+              com.sybase365.mobiliser.custom.project.persistence.dao.hibernate,
+              com.sybase365.mobiliser.custom.project.persistence.dao.hibernate.factory,
+              com.sybase365.mobiliser.custom.project.persistence.model,
+              com.sybase365.mobiliser.custom.project.ranking,
+              com.sybase365.mobiliser.custom.project.services.endpoint,
+              com.sybase365.mobiliser.custom.project.services.smartphone
+            </Private-Package>
+            <Import-Package>
+              !com.ctc.*,
+              !com.sun.msv.*,
+              !com.sun.xml.fastinfoset.stax,
+              !com.wordnik.swagger.*,
+              !javax.persistence.criteria,
+              !javax.persistence.metamodel,
+              !javax.ws.rs.*,
+              !junit.framework.*,
+              !org.apache.abdera.*,
+              !org.apache.aries.*,
+              !org.apache.cxf.*,
+              !org.apache.lucene.*,
+              !org.apache.mina.*,
+              !org.apache.ws.*,
+              !org.apache.xml.*,
+              !org.apache.xmlbeans.*,
+              !org.codehaus.jettison.*,
+              !org.codehaus.stax2,
+              !org.eclipse.jetty.*,
+              !org.joda.time.*,
+              !org.junit.*,
+              !org.opensaml.*,
+              com.sybase365.mobiliser.custom.project.services.contract.api,
+              com.sybase365.mobiliser.custom.project.services.contract.v1_0,
+              com.sybase365.mobiliser.custom.project.services.contract.v1_0.beans,
+              com.sybase365.mobiliser.custom.project.services.contract.xsd,
+              com.sybase365.mobiliser.framework.contract.v5_0.base,
+              com.sybase365.mobiliser.framework.contract.xsd,
+              com.sybase365.mobiliser.framework.event.model,
+              com.sybase365.mobiliser.framework.gateway.api,
+              com.sybase365.mobiliser.framework.gateway.security.api,
+              com.sybase365.mobiliser.framework.gateway.soap.ws.wsdl,
+              com.sybase365.mobiliser.framework.gateway.util,
+              com.sybase365.mobiliser.framework.persistence.dao.api,
+              com.sybase365.mobiliser.framework.persistence.model,
+              com.sybase365.mobiliser.framework.service.config,
+              com.sybase365.mobiliser.framework.task.model,
+              com.sybase365.mobiliser.money.businesslogic.transaction.actions,
+              com.sybase365.mobiliser.money.businesslogic.transaction.authorisation,
+              com.sybase365.mobiliser.money.businesslogic.transaction.flow.impl,
+              com.sybase365.mobiliser.money.contract.customer.xsd,
+              com.sybase365.mobiliser.money.contract.system.xsd,
+              com.sybase365.mobiliser.money.contract.transaction.xsd,
+              com.sybase365.mobiliser.money.contract.v5_0.customer.beans,
+              com.sybase365.mobiliser.money.contract.v5_0.system.beans,
+              com.sybase365.mobiliser.money.contract.v5_0.transaction,
+              com.sybase365.mobiliser.money.contract.v5_0.transaction.beans,
+              com.sybase365.mobiliser.money.persistence.dao.factory.api,
+              com.sybase365.mobiliser.money.services.api,
+              com.sybase365.mobiliser.util.contract.v5_0.messaging,
+              com.sybase365.mobiliser.util.contract.v5_0.messaging.beans,
+              com.sybase365.mobiliser.util.messaging.channelmanager.util,
+              com.sybase365.mobiliser.util.prefs.api,
+              com.sybase365.mobiliser.util.prefs.encryption.api,
+              com.sybase365.mobiliser.util.tools.jaxbutils,
+              javassist.util.proxy;resolution:=optional,
+              javax.persistence.*,
+              javax.servlet.descriptor;version="[2.4.0,3.0.0]";resolution:=optional,
+              javax.servlet.http;version="[2.4.0,3.0.0]",
+              javax.servlet.resources;version="[2.4.0,3.0.0]",
+              javax.servlet;version="[2.4.0,3.0.0]",
+              javax.xml.bind,
+              net.sf.cglib.core,
+              net.sf.cglib.proxy;resolution:=optional,
+              net.sf.cglib.reflect,
+              org.aopalliance.aop,
+              org.aopalliance.intercept,
+              org.apache.commons.codec.binary,
+              org.apache.ws.commons.schema.constants;version="[1.4,2.5)",
+              org.apache.ws.commons.schema.extensions;version="[1.4,2.5)",
+              org.apache.ws.commons.schema.resolver;version="[1.4,2.5)",
+              org.apache.ws.commons.schema.utils;version="[1.4,2.5)",
+              org.apache.ws.commons.schema;version="[1.4,2.5)",
+              org.aspectj.weaver.reflect,
+              org.eclipse.gemini.blueprint.service.exporter.support,
+              org.eclipse.gemini.blueprint.service.importer.support,
+              org.hibernate,
+              org.hibernate.cfg,
+              org.hibernate.engine,
+              org.hibernate.hql.ast,
+              org.hibernate.proxy,
+              org.slf4j,
+              org.springframework.aop,
+              org.springframework.aop.aspectj.autoproxy,
+              org.springframework.aop.framework,
+              org.springframework.aop.interceptor,
+              org.springframework.beans.factory.config,
+              org.springframework.jdbc.core,
+              org.springframework.jdbc.datasource.lookup,
+              org.springframework.oxm,
+              org.springframework.security.access.intercept,
+              org.springframework.security.access.vote,
+              org.springframework.security.authentication,
+              org.springframework.security.web.access.expression,
+              org.springframework.security.web.access.intercept,
+              org.springframework.security.web.authentication,
+              org.springframework.security.web.authentication.rememberme,
+              org.springframework.security.web.authentication.www,
+              org.springframework.transaction,
+              org.springframework.transaction.interceptor,
+              org.springframework.web.servlet,
+              org.springframework.ws.server,
+              org.springframework.ws.soap.server.endpoint,
+              org.springframework.ws.transport,
+              org.springframework.ws.wsdl.wsdl11,
+              org.w3c.dom.*;version="[1,2)",
+              org.xml.sax.*;version="[2,3)",
+              *
+            </Import-Package>
+            <Embed-Dependency>
+              cxf-bundle-minimal;scope=provided
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.api-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.channelmanager.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.channelmanager.api-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.service.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.service.api-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.service.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.service.contract-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.b2c.messaging</groupId>
+      <artifactId>com.sybase365.mobiliser.util.messaging.template.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.template.api-${version.messaging}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.events</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.event.core</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/13-mobiliser-event/com.sybase365.mobiliser.framework.event.core-${version.events}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.contract</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.contract-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.rest</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.rest-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.security.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.security.api-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.soap.ws</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.soap.ws-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.persistence.dao-api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.framework.persistence.dao-api-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.persistence.dao-model</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.framework.persistence.dao-model-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.persistence.hibernate.dao</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.framework.persistence.hibernate.dao-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.persistence.hibernate.sessionfactory</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.framework.persistence.hibernate.sessionfactory-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.service.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.service.api-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.api-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.util</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.util-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.formatutils</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.formatutils-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.spring</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.spring-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.contract</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.ams.dao.model</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.money.ams.dao.model-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.ams.export</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.ams.export-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.ams.logic</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.ams.logic-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.authentication.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.authentication.api-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.billpayment.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.billpayment.api-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.customer</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.customer-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.payment.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.payment.api-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.payment.handlers.model</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.payment.handlers.model-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.transaction</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.transaction-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.businesslogic.util</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.businesslogic.util-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.jobs.event.handler.util</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.jobs.event.handler.util-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.jobs.event.model</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.jobs.event.model-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.persistence.dao-api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.money.persistence.dao-api-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.persistence.dao-model</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/10-mobiliser-persistence/com.sybase365.mobiliser.money.persistence.dao-model-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.money</groupId>
+      <artifactId>com.sybase365.mobiliser.money.services.util</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/15-mobiliser-money-businesslogic-services/com.sybase365.mobiliser.money.services.util-${version.money}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.oss</groupId>
+      <artifactId>com.springsource.org.hibernate</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.hibernate-3.3.2.GA-sap-05.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>com.springsource.org.hibernate.annotations</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/01-fragments/com.springsource.org.hibernate.annotations-3.4.0.GA-A.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.hibernate.annotations.common-3.3.0.ga.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>com.springsource.javax.annotation</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.javax.annotation-1.0.0.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.transaction</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.transaction-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.aop</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.aop-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.beans</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.beans-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.context</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.context-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.core</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.core-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.web</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.web-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.web.servlet</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.springframework.web.servlet-3.1.4.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.prefs</groupId>
+      <artifactId>com.sybase365.mobiliser.util.prefs.encryption.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/12-mobiliser-prefs/com.sybase365.mobiliser.util.prefs.encryption.api-${version.prefs}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.apache.commons.lang-2.5.0.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/spring-security-core-3.1.3.RELEASE.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.aopalliance</groupId>
+      <artifactId>com.springsource.org.aopalliance</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.aopalliance-1.0.0.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>com.springsource.javax.persistence</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.javax.persistence-1.99.0.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.smack</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.apache.servicemix.bundles.smack-3.2.1_1.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-minimal</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>msv-core</artifactId>
+          <groupId>net.java.dev.msv</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

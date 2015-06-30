@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+    <artifactId>com.sybase365.mobiliser.custom.project</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>com.sybase365.mobiliser.custom.project.context</artifactId>
+  <name>AIMS Mobiliser :: Custom :: Project Context</name>
+  <packaging>bundle</packaging>
+  <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${basedir}/target/context-configuration</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-context-configuration</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.framework.gateway.context-${version.framework}.jar"
+                  dest="${basedir}/target/context-configuration/META-INF/spring">
+                  <patternset>
+                    <include name="**/bundle*.xml" />
+                  </patternset>
+                </unzip>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Category>custom</Bundle-Category>
+            <Export-Package></Export-Package>
+            <Private-Package></Private-Package>
+            <Import-Package>
+              com.sybase365.mobiliser.framework.gateway.api,
+              com.sybase365.mobiliser.framework.gateway.soap.ws.wsdl,
+              com.sybase365.mobiliser.framework.gateway.security.api,
+              org.springframework.ws.server,
+              org.springframework.ws.soap.server.endpoint,
+              org.springframework.ws.wsdl.wsdl11,
+              org.springframework.ws.transport,
+              org.springframework.security.web.authentication,
+              org.springframework.security.authentication,
+              org.springframework.security.web.authentication.www,
+              org.springframework.security.web.authentication.rememberme,
+              org.springframework.security.web.access.intercept,
+              org.springframework.security.access.vote,
+              org.springframework.security.web.access.expression,
+              org.springframework.security.access.intercept,
+              org.springframework.transaction,
+              org.springframework.web.servlet,
+              org.aspectj.weaver.reflect,
+              org.springframework.aop.framework,
+              org.springframework.aop,
+              org.aopalliance.aop,
+              org.springframework.aop.aspectj.autoproxy,
+              javax.servlet;version="[2.4.0, 3.0.0]",
+              javax.servlet.http;version="[2.4.0, 3.0.0]",
+              javax.servlet.resources;version="[2.4.0, 3.0.0]",
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.soap.ws</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.soap.ws-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.rest</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.rest-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.framework</groupId>
+      <artifactId>com.sybase365.mobiliser.framework.gateway.security.api</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/11-mobiliser-framework/com.sybase365.mobiliser.framework.gateway.security.api-${version.framework}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.common.tools</groupId>
+      <artifactId>com.sybase365.mobiliser.util.tools.spring</artifactId>
+      <version>IGNORED</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/08-mobiliser-tools/com.sybase365.mobiliser.util.tools.spring-${version.mobiliser-tools}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

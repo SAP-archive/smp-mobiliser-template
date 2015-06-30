@@ -1,0 +1,547 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+    <artifactId>com.sybase365.mobiliser.custom.project</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>com.sybase365.mobiliser.custom.project.dist</artifactId>
+  <name>AIMS Mobiliser :: Custom :: Project Distributable</name>
+  <packaging>war</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <overlays>
+            <overlay>
+              <groupId>com.sap.mobile.platform.server.appservices.money.vanilla</groupId>
+              <artifactId>com.sybase365.mobiliser.vanilla.war</artifactId>
+              <excludes>
+                <exclude>WEB-INF/osgi/derby/**</exclude>
+              </excludes>
+            </overlay>
+          </overlays>
+          <archive>
+            <manifestFile>${basedir}/../repo/target/war/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+          <warName>mobiliser</warName>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-derby</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.sap.mobile.platform.server.appservices.money.vanilla</groupId>
+                  <artifactId>com.sybase365.mobiliser.vanilla.war</artifactId>
+                  <version>${version.smp-mobiliser-war}</version>
+                  <type>war</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/derby</outputDirectory>
+                  <includes>**/derby/**</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-customisation</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/customisation-bundles</outputDirectory>
+              <includeArtifactIds>com.sybase365.mobiliser.custom.project.contract,com.sybase365.mobiliser.custom.project.context,com.sybase365.mobiliser.custom.project.service,webservices-api-osgi,neethi,stax2-api,woodstox-core-asl</includeArtifactIds>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>configure-osgi-runtime</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <move
+                  todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/50-custom-businesslogic-services">
+                  <fileset
+                    dir="${project.build.directory}/customisation-bundles"
+                    includes="**/*.jar" />
+                </move>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-derby">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${org.apache.servicemix.bundles:org.apache.servicemix.bundles.derby:jar}"
+                  dest="${basedir}/target/dbmaintain-derby">
+                  <patternset>
+                    <exclude name="META-INF/**/*,OSGI-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-derby}"
+                  dest="${basedir}/target/dbmaintain-derby">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <!-- CUSTOMISATION POINT - leave only the database variant you will be using here -->
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-anywhere">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-anywhere}"
+                  dest="${basedir}/target/dbmaintain-anywhere">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-ase">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-ase}"
+                  dest="${basedir}/target/dbmaintain-ase">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-db2">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-db2}"
+                  dest="${basedir}/target/dbmaintain-db2">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-hdb">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-hdb}"
+                  dest="${basedir}/target/dbmaintain-hdb">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-mssql">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-mssql}"
+                  dest="${basedir}/target/dbmaintain-mssql">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+
+                <unzip
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  dest="${basedir}/target/dbmaintain-oracle">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.customization:com.sybase365.mobiliser.custom.project.service:zip:db-scripts-oracle}"
+                  dest="${basedir}/target/dbmaintain-oracle">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <!-- END CUSTOMISATION POINT - leave only the database variant you will be using above -->
+
+                <!-- REPORTING MOBILISER INTEGRATION -->
+                <!-- Uncomment to include reporting mobiliser in your custom WAR file -->
+<!--
+                <unzip
+                  src="${com.sap.mobile.platform.server.appservices.money.dist:com.sybase365.mobiliser.dist.full:zip:reporting}"
+                  dest="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/">
+                  <patternset>
+                    <exclude name="META-INF/**/*" />
+                  </patternset>
+                </unzip>
+-->
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>derby-customisation</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+
+                <exec dir="${project.build.directory}/derby/WEB-INF/osgi/derby" executable="java" taskname="dbmaintain-product" failonerror="true">
+                  <arg line="-jar"/>
+                  <arg line="${project.build.directory}/derby/WEB-INF/osgi/derby/com.sybase365.mobiliser.vanilla.standalone-${version.vanilla}-scriptarchive-derby.jar"/>
+                  <arg line="-c"/>
+                  <arg line="${basedir}/target/dbmaintain-derby/dbmaintain.properties.derby"/>
+                  <arg line="-clean"/>
+                </exec>
+
+                <exec dir="${project.build.directory}/derby/WEB-INF/osgi/derby" executable="java" taskname="dbmaintain-custom" failonerror="true">
+                  <arg line="-jar"/>
+                  <arg line="${project.build.directory}/com.sybase365.mobiliser.custom.project.dist-${project.version}-scriptarchive-derby.jar"/>
+                  <arg line="-c"/>
+                  <arg line="${project.build.directory}/dbmaintain-derby/dbmaintain.properties.derby"/>
+                </exec>
+
+                <move file="${project.build.directory}/derby/WEB-INF/osgi/derby" tofile="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/derby"/>
+
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <!-- CUSTOMISATION POINT - leave only the database variant you will be using here -->
+          <execution>
+            <id>make-assembly-dbmaintain-anywhere</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-anywhere.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-ase</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-ase.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-db2</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-db2.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-derby</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-derby.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-hdb</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-hdb.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-mssql</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-mssql.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-assembly-dbmaintain-oracle</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.sybase.dbmaintain.DbMaintainExecuter</mainClass>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/main/assembly/db-maintain-oracle.xml</descriptor>
+              </descriptors>
+              <archiverConfig>
+                <defaultDirectoryMode>493</defaultDirectoryMode>
+              </archiverConfig>
+            </configuration>
+          </execution>
+          <!-- END CUSTOMISATION POINT - leave only the database variant you will be using above -->
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.vanilla</groupId>
+      <artifactId>com.sybase365.mobiliser.vanilla.war</artifactId>
+      <version>${version.smp-mobiliser-war}</version>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.contract</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.context</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-derby</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <!-- CUSTOMISATION POINT - leave only the database variant you will be using here -->
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-anywhere</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-ase</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-db2</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-hdb</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-mssql</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+      <artifactId>com.sybase365.mobiliser.custom.project.service</artifactId>
+      <version>${project.version}</version>
+      <classifier>db-scripts-oracle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <!-- END CUSTOMISATION POINT - leave only the database variant you will be using above -->
+    <dependency>
+      <groupId>javax.xml</groupId>
+      <artifactId>webservices-api-osgi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.neethi</groupId>
+      <artifactId>neethi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>stax2-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>woodstox-core-asl</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- REPORTING MOBILISER INTEGRATION -->
+<!--
+    <dependency>
+      <groupId>com.sap.mobile.platform.server.appservices.money.dist</groupId>
+      <artifactId>com.sybase365.mobiliser.dist.full</artifactId>
+      <version>${version.reporting-mobiliser}</version>
+      <scope>provided</scope>
+      <classifier>reporting</classifier>
+      <type>zip</type>
+    </dependency>
+-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<xs:schema version="1.0"
+  targetNamespace="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0/beans"
+  xmlns="http://mobiliser.sybase365.com/custom/project/services/contract/v1_0/beans"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:base="http://mobiliser.sybase365.com/framework/contract/v5_0/base"
+  xmlns:Q1="http://mobiliser.sybase365.com/money/contract/v5_0/customer/beans">
+
+  <xs:import schemaLocation="../../../../../money/contract/customer/xsd/beans-5-0.xsd"
+    namespace="http://mobiliser.sybase365.com/money/contract/v5_0/customer/beans"></xs:import>
+  <xs:import
+    namespace="http://mobiliser.sybase365.com/framework/contract/v5_0/base"
+    schemaLocation="../../../../../framework/contract/xsd/base-5-0.xsd" />
+
+  <!-- All business entities for the blacklist service are defined in this
+    contract -->
+
+  <xs:complexType name="Blacklist">
+    <xs:annotation>
+      <xs:documentation>The bean that represents a Blacklist entry</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="id" type="base:idLong" minOccurs="0" />
+      <xs:element name="blacklistType" type="base:idShort" />
+      <xs:element name="name" type="base:strLarge" />
+      <xs:element name="created" type="xs:dateTime"
+        minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BlacklistType">
+    <xs:annotation>
+      <xs:documentation>
+        represents a certain type of blacklist
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="id" type="base:idShort">
+        <xs:annotation>
+          <xs:documentation>The primary key, needs to be provided during creation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="name" type="base:strMediumNonEmpty">
+        <xs:annotation>
+          <xs:documentation>A short description of the blacklist type</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="errorCode" type="base:idShort"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Error code is optional. If not set the default error code is used.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+

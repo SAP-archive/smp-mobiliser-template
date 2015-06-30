@@ -1,0 +1,491 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mobconfig="http://www.sybase.com/mobiliser/framework/service/config"
+	xmlns:prefs="http://www.sybase.com/mobiliser/util/prefs/config"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+  http://www.sybase.com/mobiliser/framework/service/config http://www.sybase.com/mobiliser/framework/service/config/sybase-service-config-5.0.xsd
+  http://www.sybase.com/mobiliser/util/prefs/config http://www.sybase.com/mobiliser/util/prefs/config/sybase-prefs-config-5.0.xsd
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- ############################################################ -->
+	<!-- # Preferences Configuration ################################ -->
+	<!-- ############################################################ -->
+
+	<prefs:node id="prefsNode" auto-decrypt="true"
+		class="com.sybase365.mobiliser.custom.project.businesslogic.configuration.CustomProjectConfiguration" />
+
+	<!-- ############################################################ -->
+	<!-- # Client to access Weather soap service #################### -->
+	<!-- ############################################################ -->
+
+	<!-- Import a preferences node for configuration, have the weatherTargetSource 
+		refreshed whenever the configuration changes -->
+	<prefs:node id="weatherNode"
+		class="com.sybase365.mobiliser.custom.project.client.WeatherTargetSource"
+		refreshable-beans="weatherTargetSource" auto-decrypt="true" />
+
+	<!-- Setup a target source to generate the instance based on the prefs -->
+	<bean id="weatherTargetSource"
+		class="com.sybase365.mobiliser.custom.project.client.WeatherTargetSource">
+		<!-- ref to preferences service -->
+		<constructor-arg ref="weatherNode" />
+	</bean>
+
+	<!-- Create a proxy which will be handed out to client code which knows 
+		nothing of preferences -->
+	<bean id="weatherClient" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource" ref="weatherTargetSource" />
+		<property name="interfaces">
+			<list>
+				<value>com.cdyne.ws.weatherws.WeatherSoap</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ######################################################################################################## -->
+	<!-- # For the ranking example: overrule one of the internal services with 
+		a custom impl #################### -->
+	<!-- ######################################################################################################## -->
+
+	<!-- proxy the delegate and add new functionality through advice objects -->
+	<bean id="overrideCustomerLogic" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="delegateCustomerLogic" />
+		<property name="interfaces">
+			<list>
+				<value>com.sybase365.mobiliser.money.businesslogic.customer.ICustomerOtpLogic
+				</value>
+			</list>
+		</property>
+		<!-- these can be advice or adviser objects -->
+		<property name="interceptorNames">
+			<list>
+				<value>otpAdviser</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="otpInterceptor"
+		class="com.sybase365.mobiliser.custom.project.ranking.CustomerOtpInterceptor" />
+
+	<bean id="otpAdviser"
+		class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+		<property name="mappedNames">
+			<list>
+				<!-- names of the methods we want to override, we must handle them in 
+					the interceptor -->
+				<value>createCustomerOtp</value>
+			</list>
+		</property>
+		<property name="advice" ref="otpInterceptor" />
+	</bean>
+
+
+	<!-- ######################################################################################################## -->
+	<!-- # Service Endpoint definition #################### -->
+	<!-- ######################################################################################################## -->
+
+
+	<bean id="blacklistEndpoint" parent="abstractEndpoint"
+		class="com.sybase365.mobiliser.framework.gateway.api.impl.EndpointInformationImpl">
+		<property name="endpoint" ref="blacklistImpl" />
+		<property name="allowedMessageElements">
+			<list>
+				<value>(Create|Delete|Get|Update)Blacklist(Request|Response)
+				</value>
+				<value>FindBlacklistByName(Request|Response)</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="blacklistTypeEndpoint" parent="abstractEndpoint"
+		class="com.sybase365.mobiliser.framework.gateway.api.impl.EndpointInformationImpl">
+		<property name="endpoint" ref="blacklistTypeImpl" />
+		<property name="allowedMessageElements">
+			<list>
+				<value>(Create|Get|)BlacklistType(Request|Response)</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="weatherEndpoint" parent="abstractEndpoint"
+		class="com.sybase365.mobiliser.framework.gateway.api.impl.EndpointInformationImpl">
+		<property name="endpoint" ref="weatherServiceImpl" />
+
+		<property name="allowedMessageElements">
+			<list>
+				<value>GetWeather(Request|Response)</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean abstract="true" id="abstractEndpoint">
+		<property name="contextPaths">
+			<list>
+				<value>com.sybase365.mobiliser.framework.contract.v5_0.base
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.customer.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.system.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.transaction.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.transaction
+				</value>
+				<value>com.sybase365.mobiliser.custom.project.services.contract.v1_0
+				</value>
+				<value>com.sybase365.mobiliser.custom.project.services.contract.v1_0.beans
+				</value>
+			</list>
+		</property>
+		<property name="schemaPaths">
+			<list>
+				<value>/com/sybase365/mobiliser/framework/contract/xsd/base-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/customer/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/system/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/transaction/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/transaction/xsd/requests-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/custom/project/services/contract/xsd/beans-1-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/custom/project/services/contract/xsd/requests-1-0.xsd
+				</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="blacklistImplDelegate"
+		class="com.sybase365.mobiliser.custom.project.services.endpoint.BlacklistEndpoint">
+		<property name="callerUtils" ref="callerUtils" />
+		<property name="blacklistLogic" ref="blacklistLogic" />
+		<property name="blacklistConverter" ref="blacklistConverter" />
+	</bean>
+
+	<bean id="blacklistTypeImplDelegate"
+		class="com.sybase365.mobiliser.custom.project.services.endpoint.BlacklistTypeEndpoint">
+		<property name="callerUtils" ref="callerUtils" />
+		<property name="blacklistTypeLogic" ref="blacklistTypeLogic" />
+		<property name="blacklistTypeConverter" ref="blacklistTypeConverter" />
+	</bean>
+
+
+  <bean id="weatherServiceImplDelegate"
+    class="com.sybase365.mobiliser.custom.project.services.endpoint.WeatherEndpoint">
+    <property name="callerUtils" ref="callerUtils" />
+    <property name="weatherClient" ref="weatherClient" />
+  </bean>
+
+	<!-- ######################################################################################################## -->
+	<!-- # Smartphone Service Endpoint definition #################### -->
+	<!-- ######################################################################################################## -->
+
+	<!-- DELEGATE INTERNAL SERVICE BEANS -->
+	<mobconfig:mobiliser-internal-service
+		id="blacklistEndpointServiceBean" endpoint-ref="blacklistEndpoint"
+		authenticator-factory-enabled="false"
+		proxy-interfaces="com.sybase365.mobiliser.custom.project.services.contract.api.IBlacklistEndpoint" />
+
+	<bean id="smartphoneImplDelegate"
+		class="com.sybase365.mobiliser.custom.project.services.smartphone.SmartphoneEndpoint">
+		<property name="callerUtils" ref="callerUtils" />
+		<property name="blacklistEndpoint" ref="blacklistEndpointServiceBean" />
+	</bean>
+
+	<!-- ENDPOINT INFORMATION BEANS -->
+	<bean id="customEndpointSmart"
+		class="com.sybase365.mobiliser.framework.gateway.api.impl.EndpointInformationImpl">
+		<property name="endpoint" ref="smartphoneImpl" />
+		<property name="contextPaths">
+			<list>
+				<value>com.sybase365.mobiliser.framework.contract.v5_0.base</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.customer.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.system.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.transaction.beans
+				</value>
+				<value>com.sybase365.mobiliser.money.contract.v5_0.transaction
+				</value>
+				<value>com.sybase365.mobiliser.custom.project.services.contract.v1_0
+				</value>
+				<value>com.sybase365.mobiliser.custom.project.services.contract.v1_0.beans
+				</value>
+			</list>
+		</property>
+		<property name="schemaPaths">
+			<list>
+				<value>/com/sybase365/mobiliser/framework/contract/xsd/base-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/customer/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/system/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/transaction/xsd/beans-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/money/contract/transaction/xsd/requests-5-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/custom/project/services/contract/xsd/beans-1-0.xsd
+				</value>
+				<value>/com/sybase365/mobiliser/custom/project/services/contract/xsd/requests-1-0.xsd
+				</value>
+			</list>
+		</property>
+		<property name="allowedMessageElements">
+			<list>
+				<value>GetBlacklist(Request|Response)</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- ######################################################################################################## -->
+	<!-- # Persistence configuration ############################################################################ -->
+	<!-- ######################################################################################################## -->
+
+	<bean id="mobiliserBeans"
+		class="com.sybase365.mobiliser.custom.project.persistence.dao.hibernate.factory.MobiliserHibernateBeans">
+		<property name="ehCacheConfigurationFileName" value="mobiliser_ehcache.xml" />
+	</bean>
+
+	<bean id="daoFactory"
+		class="com.sybase365.mobiliser.custom.project.persistence.dao.hibernate.factory.HibernateDaoFactoryImpl">
+		<property name="blacklistDao" ref="blacklistDaoImpl" />
+		<property name="blacklistTypeDao" ref="blacklistTypeDaoImpl" />
+	</bean>
+
+	<bean id="blacklistDaoImpl" parent="translatingDao">
+		<property name="target">
+		  <bean  parent="abstractDao"
+		    class="com.sybase365.mobiliser.custom.project.persistence.dao.hibernate.BlacklistDaoHbnImpl" />
+		</property>
+	</bean>
+
+	<bean id="blacklistTypeDaoImpl" parent="translatingDao">
+		<property name="target">
+		  <bean parent="abstractDao"
+		    class="com.sybase365.mobiliser.custom.project.persistence.dao.hibernate.BlacklistTypeDaoHbnImpl" />
+		</property>
+	</bean>
+
+	<bean id="abstractDao" abstract="true">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="exceptionAdvice"
+		class="org.springframework.dao.support.PersistenceExceptionTranslationInterceptor">
+		<property name="persistenceExceptionTranslator" ref="exceptionTranslator" />
+	</bean>
+
+	<bean id="translatingDao" class="org.springframework.aop.framework.ProxyFactoryBean" abstract="true">
+		<property name="interceptorNames">
+			<list>
+				<value>exceptionAdvice</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- ######################################################################################################## -->
+	<!-- # Wrapped Services ##################################################################################### -->
+	<!-- ######################################################################################################## -->
+
+	<!-- this adds an Authentication Context wrapping around a service call -->
+	<!-- the user to use can be configured via preferences -->
+
+	<bean id="internalAuthData"
+		class="com.sybase365.mobiliser.money.services.util.InternalServiceCallConfiguration">
+		<property name="preferences" ref="prefsNode" />
+	</bean>
+
+	<mobconfig:mobiliser-internal-service
+		id="authenticatedCustomerEndpoint" endpoint-ref="customerEndpoint"
+		authenticator-factory-enabled="false" enable-auditing="true"
+		proxy-interfaces="com.sybase365.mobiliser.money.services.api.ICustomerEndpoint" />
+
+	<mobconfig:mobiliser-internal-service
+		id="authenticatedAttachmentEndpoint" endpoint-ref="attachmentEndpoint"
+		authenticator-factory-enabled="false" enable-auditing="true"
+		proxy-interfaces="com.sybase365.mobiliser.money.services.api.IAttachmentEndpoint" />
+
+	<mobconfig:mobiliser-internal-service
+		id="authenticatedMessagingService" endpoint-ref="messagingService"
+		proxy-interfaces="com.sybase365.mobiliser.util.messaging.service.api.IMessagingService" />
+
+	<!-- the event handler is wrapped to take care of transaction demarcation -->
+	<bean id="blacklistEventHandler" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean
+				class="com.sybase365.mobiliser.custom.project.jobs.event.handler.blacklist.BlacklistEventHandler">
+				<!-- Spring Injection -->
+				<property name="daoFactory" ref="moneyDaoFactory" />
+				<property name="messagingService" ref="authenticatedMessagingService" />
+				<property name="notificationLogic" ref="notificationLogic" />
+				<property name="eventGenerator" ref="eventGenerator" />
+				<property name="configuration" ref="blacklistConfiguration" />
+			</bean>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>eventTxAdvice</value>
+			</list>
+		</property>
+		<property name="interfaces">
+			<list>
+				<value>com.sybase365.mobiliser.framework.event.model.Handler</value>
+			</list>
+		</property>
+	</bean>
+
+	<tx:advice id="eventTxAdvice">
+		<tx:attributes>
+			<tx:method name="process" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- DAOs -->
+
+
+	<!-- here we are just pulling one specific DAO from the daoFactory because 
+		it is all we need (makes it easier to test the class) -->
+
+	<!-- CONFIGURATION -->
+
+
+	<!-- PREPARE INTERNAL SERVICE CALLS -->
+
+	<bean id="blacklistInternalAuthData"
+		class="com.sybase365.mobiliser.money.services.util.InternalServiceCallConfiguration">
+		<property name="preferences" ref="blacklistPrefsNode" />
+	</bean>
+
+	<bean id="configuration"
+		class="com.sybase365.mobiliser.custom.project.businesslogic.configuration.CustomProjectConfiguration">
+		<property name="preferences" ref="prefsNode" />
+	</bean>
+
+	<!-- PREFERENCES CONFIGURATION - simple example -->
+	<!-- Prefs for black list event handler -->
+
+	<prefs:node id="blacklistPrefsNode"
+		class="com.sybase365.mobiliser.custom.project.jobs.event.handler.blacklist.BlacklistEventHandler" />
+
+	<bean id="blacklistConfiguration"
+		class="com.sybase365.mobiliser.custom.project.jobs.event.handler.blacklist.BlacklistEventHandlerConfiguration">
+		<property name="preferences" ref="prefsNode" />
+	</bean>
+
+	<!-- BUSINESS LOGIC CONFIGURATION -->
+
+	<bean id="blacklistLogic"
+		class="com.sybase365.mobiliser.custom.project.businesslogic.impl.BlacklistLogic">
+		<property name="daoFactory" ref="daoFactory" />
+		<property name="configuration" ref="configuration" />
+		<property name="messagingService" ref="messagingService" />
+		<property name="eventGenerator" ref="eventGenerator" />
+	</bean>
+
+	<bean id="blacklistConverter"
+		class="com.sybase365.mobiliser.custom.project.converter.impl.BlacklistConverter">
+		<property name="daoFactory" ref="daoFactory" />
+	</bean>
+
+	<bean id="blacklistTypeLogic"
+		class="com.sybase365.mobiliser.custom.project.businesslogic.impl.BlacklistTypeLogicImpl">
+		<property name="daoFactory" ref="daoFactory" />
+	</bean>
+
+	<bean id="blacklistTypeConverter"
+		class="com.sybase365.mobiliser.custom.project.converter.impl.BlacklistTypeConverter">
+
+		<property name="daoFactory" ref="daoFactory" />
+	</bean>
+
+	<bean id="customTxnFlow"
+		class="com.sybase365.mobiliser.custom.project.businesslogic.impl.CustomTransactionFlowOverlay">
+	</bean>
+
+	<!-- PREPARE INTERNAL SERVICE CALLS -->
+
+
+	<!-- the various handlers that are included in hte business logic bundle -->
+
+	<bean id="loyaltyPaymentHandler"
+		class="com.sybase365.mobiliser.custom.project.handlers.payment.LoyaltyCardPaymentHandler">
+		<property name="daoFactory" ref="moneyDaoFactory" />
+	</bean>
+
+	<bean id="customAuthenticationHandler"
+		class="com.sybase365.mobiliser.custom.project.handlers.authentication.CustomAuthenticationHandler">
+
+		<property name="daoFactory" ref="moneyDaoFactory" />
+	</bean>
+
+	<bean id="gtalkAuthHandler"
+		class="com.sybase365.mobiliser.custom.project.handlers.authentication.GtalkAuthenticationHandler"
+		destroy-method="destroy">
+
+		<property name="notificationLogic" ref="notificationLogic" />
+	</bean>
+
+	<bean id="dummyBillPaymentHandler"
+		class="com.sybase365.mobiliser.custom.project.handlers.billpayment.DummyBillpaymentHandler">
+	</bean>
+
+	<bean id="customExchangeRateHandler"
+		class="com.sybase365.mobiliser.custom.project.handlers.exchangerate.CustomExchangeRateHandler">
+	</bean>
+
+    <!-- Channel  -->
+  <bean id="httpChannelFactory"
+    class="com.sybase365.mobiliser.util.messaging.channelmanager.util.impl.ChannelFactoryBean">
+    <property name="beanName" value="httpChannel" />
+    <property name="dependentBeans">
+      <util:map>
+        <entry key="messagingEngine" value-ref="messagingEngine" />
+        <entry key="receiveCallback" value-ref="receiveCallback" />
+      </util:map>
+    </property>
+    <property name="resources">
+      <list>
+        <value>classpath:/com/sybase365/mobiliser/custom/project/channels/spring-beans.xml</value>
+      </list>
+    </property>
+    <property name="defaultProperties">
+      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="classpath:/com/sybase365/mobiliser/custom/project/channels/default-properties.properties" />
+      </bean>
+    </property>
+  </bean>
+  
+</beans>

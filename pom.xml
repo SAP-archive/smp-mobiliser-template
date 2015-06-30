@@ -1,0 +1,578 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    Copyright (C) 2012-2015 SAP SE
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sap.mobile.platform.server.appservices.money.customization</groupId>
+  <artifactId>com.sybase365.mobiliser.custom.project</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>AIMS Mobiliser :: Custom :: Project Parent POM</name>
+  <packaging>pom</packaging>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <properties>
+    <mobiliser.encoding>UTF-8</mobiliser.encoding>
+    <propertiesfile.encoding>UTF-8</propertiesfile.encoding>
+    <!-- This is interpreted as decimal, cf. MASSEMBLY-494 -->
+    <mobDefaultDirectoryMode>493</mobDefaultDirectoryMode>
+    <version.java>1.7</version.java>
+    <version.maven-javadoc-plugin>2.7</version.maven-javadoc-plugin>
+    <version.maven-compiler-plugin>2.3.2</version.maven-compiler-plugin>
+    <manifest.name>com/sybase365/mobiliser/custom/project</manifest.name>
+    <manifest.title>Sybase365 Mobiliser Customization Project</manifest.title>
+    <manifest.spec-version>1.0.0</manifest.spec-version>
+
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+    <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
+
+    <version.smp-mobiliser-war>5.5.0</version.smp-mobiliser-war>
+    <version.smp-portal-war>5.5.0</version.smp-portal-war>
+    <version.framework>5.5.0</version.framework>
+    <version.vanilla>5.5.0</version.vanilla>
+    <version.money>5.5.0</version.money>
+    <version.mbanking>1.5.0</version.mbanking>
+    <version.workflow>5.5.0</version.workflow>
+    <version.mobiliser-tools>5.5.0</version.mobiliser-tools>
+    <version.prefs>5.5.0</version.prefs>
+    <version.messaging>5.5.0</version.messaging>
+    <version.management>5.5.0</version.management>
+    <version.reports>5.5.0</version.reports>
+    <version.web>5.5.0</version.web>
+    <version.events>1.5.0</version.events>
+    <version.brand>1.3.0</version.brand>
+    <version.dbmaintain>2.4.6.7-sap-02</version.dbmaintain>
+
+    <version.reporting-mobiliser>5.5.0</version.reporting-mobiliser>
+
+    <version.junit>4.8.1</version.junit>
+    <version.derby>10.8.2.2_1</version.derby>
+    <version.wicket>1.4.23</version.wicket>
+    <version.slf4j>1.6.1</version.slf4j>
+
+    <!-- CUSTOMISATION POINT - set to false to customise the webui -->
+    <webui.disabled>true</webui.disabled>
+    <!-- END CUSTOMISATION POINT -->
+  </properties>
+
+  <!-- TODO: CUSTOMISATION POINT
+  <scm>
+    <connection>scm:git:https://github.com/SAP/smp_mobiliser_template.git</connection>
+    <developerConnection>scm:git:https://github.com/SAP/smp_mobiliser_template.git</developerConnection>
+  </scm>
+    -->
+
+  <modules>
+    <module>repo</module>
+    <module>contract</module>
+    <module>context</module>
+    <module>service</module>
+    <module>dist</module>
+    <!-- CUSTOMISATION POINT - uncomment after adding webui sources
+    <module>web</module>
+         END CUSTOMISATION POINT -->
+    <module>test</module>
+  </modules>
+  <profiles>
+    <!-- MSOURCES-13 related workaround overriding super-pom -->
+    <profile>
+      <id>release-profile</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <inherited>true</inherited>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources-no-fork</id>
+                <inherited>true</inherited>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.3.7</version>
+          <extensions>true</extensions>
+          <configuration>
+            <obrRepository>NONE</obrRepository>
+            <instructions>
+              <Bundle-Name>${project.name}</Bundle-Name>
+              <Bundle-Version>${project.version}</Bundle-Version>
+              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+              <_snapshot>${osgi-version-qualifier}</_snapshot>
+            </instructions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.4.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.maven-compiler-plugin}</version>
+          <configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+            <encoding>${mobiliser.encoding}</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.5</version>
+          <configuration>
+            <updateReleaseInfo>true</updateReleaseInfo>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.8</version>
+          <configuration>
+            <ajdtVersion>none</ajdtVersion>
+            <buildOutputDirectory>build</buildOutputDirectory>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.maven-javadoc-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4.3</version>
+          <configuration>
+            <encoding>${mobiliser.encoding}</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-plugin</artifactId>
+          <version>1.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+          <configuration>
+            <locales>en</locales>
+            <inputEncoding>${mobiliser.encoding}</inputEncoding>
+            <outputEncoding>${mobiliser.encoding}</outputEncoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+            <!-- http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html -->
+            <!-- here we override the super-pom attach-sources executionid 
+              which calls sources:jar goal. That goals forks the lifecycle, causing the 
+              generate-sources phase to be called twice for the install goal. This causes 
+              any other plugin bound to the generate-sources phase to be called twice which 
+              usually has nasty side effects, let alone creating duplicate processing and 
+              longer build times. -->
+            <execution>
+              <id>attach-sources</id>
+              <phase>DISABLE_FORKED_LIFECYCLE_MSOURCES-13</phase>
+            </execution>
+          </executions>
+          <configuration>
+            <excludes>
+              <!-- Make sure generated JARs do not contain log4j configuration 
+                files -->
+              <exclude>**/log4j.properties</exclude>
+              <exclude>**/log4j.xml</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.12</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.surefire</groupId>
+              <artifactId>surefire-junit47</artifactId>
+              <version>2.12</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <forkMode>never</forkMode>
+            <!-- TODO: Hack to avoid OverlappingFileException: http://jira.codehaus.org/browse/SONAR-172 -->
+            <systemPropertyVariables>
+              <cobertura.use.java.nio>false</cobertura.use.java.nio>
+            </systemPropertyVariables>
+            <!-- End hack -->
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.1.1</version>
+          <configuration>
+            <archive>
+              <manifestSections>
+                <manifestSection>
+                  <name>${manifest.name}</name>
+                  <manifestEntries>
+                    <Specification-Title>${manifest.title}</Specification-Title>
+                    <Specification-Version>${manifest.spec-version}</Specification-Version>
+                    <Specification-Vendor>SAP SE</Specification-Vendor>
+                    <Implementation-Title>${manifest.title}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                    <Implementation-Vendor>SAP SE</Implementation-Vendor>
+                  </manifestEntries>
+                </manifestSection>
+              </manifestSections>
+            </archive>
+            <attachClasses>true</attachClasses>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-archetype-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+        <plugin>
+          <groupId>com.sun.tools.xjc.maven2</groupId>
+          <artifactId>maven-jaxb-plugin</artifactId>
+          <version>1.1.1</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+            </execution>
+          </executions>
+          <dependencies>
+            <!-- configure the correct versions of jaxb api and impl -->
+            <dependency>
+              <groupId>org.apache.servicemix.bundles</groupId>
+              <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId>
+              <version>2.2.4_1</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.servicemix.bundles</groupId>
+              <artifactId>org.apache.servicemix.bundles.jaxb-xjc</artifactId>
+              <version>2.2.4_1</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.servicemix.specs</groupId>
+              <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
+              <version>1.9.0</version>
+            </dependency>
+            <dependency>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>jaxb2-basics-annotate</artifactId>
+              <version>0.6.4</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.1</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <excludes>
+              <!-- Make sure generated JARs do not contain log4j configuration 
+                files -->
+              <exclude>**/log4j.properties</exclude>
+              <exclude>**/log4j.xml</exclude>
+            </excludes>
+            <archive>
+              <manifestSections>
+                <manifestSection>
+                  <name>${manifest.name}</name>
+                  <manifestEntries>
+                    <Specification-Title>${manifest.title}</Specification-Title>
+                    <Specification-Version>${manifest.spec-version}</Specification-Version>
+                    <Specification-Vendor>SAP SE</Specification-Vendor>
+                    <Implementation-Title>${manifest.title}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                    <Implementation-Vendor>SAP SE</Implementation-Vendor>
+                  </manifestEntries>
+                </manifestSection>
+              </manifestSections>
+            </archive>
+          </configuration>
+        </plugin>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <versionRange>[1.7,)</versionRange>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.3,)</versionRange>
+                    <goals>
+                      <goal>copy-dependencies</goal>
+                      <goal>unpack</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.sun.tools.xjc.maven2</groupId>
+                    <artifactId>maven-jaxb-plugin</artifactId>
+                    <versionRange>[1.1.1,)</versionRange>
+                    <goals>
+                      <goal>generate</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <versionRange>[2.3.7,)</versionRange>
+                    <goals>
+                      <goal>bundle</goal>
+                      <goal>manifest</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jaxws-maven-plugin</artifactId>
+                    <versionRange>[1.12,)</versionRange>
+                    <goals>
+                      <goal>wsimport</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                      <runOnConfiguration>true</runOnConfiguration>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.4</version>
+          <executions>
+            <execution>
+              <id>enforce-versions</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requirePluginVersions>
+                    <message>Best Practice is to always define plugin versions!</message>
+                    <banLatest>true</banLatest>
+                    <banRelease>true</banRelease>
+                    <banSnapshots>true</banSnapshots>
+                    <phases>package</phases>
+                  </requirePluginVersions>
+                  <reactorModuleConvergence>
+                    <message>The reactor is not valid</message>
+                    <ignoreModuleDependencies>true</ignoreModuleDependencies>
+                  </reactorModuleConvergence>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>javax.xml</groupId>
+        <artifactId>webservices-api-osgi</artifactId>
+        <version>2.1-b16</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+        <version>${version.derby}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.neethi</groupId>
+        <artifactId>neethi</artifactId>
+        <version>3.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.4</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-bundle-minimal</artifactId>
+        <version>2.7.15</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>stax2-api</artifactId>
+        <version>3.1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>woodstox-core-asl</artifactId>
+        <version>4.4.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
+
