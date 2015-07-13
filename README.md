@@ -10,7 +10,7 @@ Maven >= 3.0.5
 
 ## Getting Started
 
-Obtain and install your copy of the SAP Mobile Platform, version 3.0 SPO8.
+Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP08.
 Mobiliser is packaged as an optional feature inside SMP. To begin work on your
 customisation, you need to install the mobiliser WAR file into your local maven
 repository so it can be used as a dependency of this project.
@@ -53,7 +53,11 @@ You can extract these into your customisation template like this:
 
         jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.0-project.zip src
 
-You can then add the web module to the list of modules to build in pom.xml.
+Run this from the web submodule to extract the src folder from the packaged zip
+file. You can then add the web module to the list of modules to build in
+pom.xml. Be sure to also set the propety webui.disabled to false in pom.xml to
+enable using the contents of portal.war as a repository and to deploy the
+portal.war to jetty in the test submodule.
 
 ## Customising the template
 
