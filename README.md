@@ -8,6 +8,12 @@ customisations on the Mobiliser Platform, version 5.5.0.
 JDK >= 1.7  
 Maven >= 3.0.5
 
+## Versioning
+
+This customisation template is always tailored to a specific release of the SAP
+Mobile Platform. Each release with be tracked by a git branch so before
+beginning your customisation, checkout the matching branch.
+
 ## Getting Started
 
 Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP08.
