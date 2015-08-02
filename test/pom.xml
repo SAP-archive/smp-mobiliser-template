@@ -28,7 +28,7 @@
   <name>AIMS Mobiliser :: Custom :: Project Test</name>
   <packaging>pom</packaging>
   <properties>
-    <version.jetty-maven-plugin>9.2.10.v20150310</version.jetty-maven-plugin>
+    <version.jetty-maven-plugin>9.2.12.v20150709</version.jetty-maven-plugin>
   </properties>
   <build>
     <plugins>

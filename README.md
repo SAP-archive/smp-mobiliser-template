@@ -1,7 +1,7 @@
 # Mobiliser Customisation Template
 
 This is the official customisation template for building server-side
-customisations on the Mobiliser Platform, version 5.5.0.
+customisations on the Mobiliser Platform, version 5.5.1.
 
 ## Prerequisites
 
@@ -16,20 +16,18 @@ beginning your customisation, checkout the matching branch.
 
 ## Getting Started
 
-Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP08.
-Mobiliser is packaged as an optional feature inside SMP. To begin work on your
-customisation, you need to install the mobiliser WAR file into your local maven
-repository so it can be used as a dependency of this project.
+Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP08. Then
+install the patch PL01 onto your installation. Mobiliser is packaged as an
+optional feature inside SMP. To begin work on your customisation, you need to
+install the mobiliser WAR file into your local maven repository so it can be
+used as a dependency of this project.
 
-If the mobiliser feature is active in your SMP, you'll find the mobiliser WAR
-file in $SMP_HOME/pickup. You can also extract the WAR file from the mobiliser
-feature without activating it. This can be done like this:
+PL01 does not include an updated mobiliser update-site. Instead, the patched
+5.5.1 mobiliser.war is included in the directory
+$SMP\_HOME/extras/mobiliser/custom/. Once you have located the war file,
+install it into your local repository.
 
-        jar xf $SMP_HOME/p2/com.sap.mobile.platform.server.repository/binary/com.sap.mobile.platform.server.build.feature.mobiliser_root_* pickup/mobiliser.war && mv pickup/mobiliser.war . && rm -r pickup
-
-Once you have the war file, install it into your local repository.
-
-        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.5.0 -Dpackaging=war
+        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.5.1 -Dpackaging=war
 
 ### Reporting Mobiliser
 
@@ -43,8 +41,11 @@ dist/pom.xml to have it included in your final WAR.
 
 ### Web-UI
 
+There were no changes to the portal.war for PL01, so follow the same procedure
+as for an unpatched SP08.
+
 If the mobiliser portal feature is active your SMP, you'll find the portal WAR
-file in $SMP_HOME/pickup. You can also extract the WAR file from the portal
+file in $SMP\_HOME/pickup. You can also extract the WAR file from the portal
 feature without activating it. This can be done like this:
 
         jar xf $SMP_HOME/p2/com.sap.mobile.platform.server.repository/binary/com.sap.mobile.platform.server.build.feature.mobiliser.web.portal_root_* pickup/portal.war && mv pickup/portal.war . && rm -r pickup
@@ -54,14 +55,14 @@ Once you have the war file, install it into your local repository.
         mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.5.0 -Dpackaging=war
 
 The example Web-UI sources are included in SMP in
-$SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.0-project.zip.
+$SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.1-project.zip.
 You can extract these into your customisation template like this:
 
-        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.0-project.zip src
+        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.1-project.zip src
 
 Run this from the web submodule to extract the src folder from the packaged zip
 file. You can then add the web module to the list of modules to build in
-pom.xml. Be sure to also set the propety webui.disabled to false in pom.xml to
+pom.xml. Be sure to also set the property webui.disabled to false in pom.xml to
 enable using the contents of portal.war as a repository and to deploy the
 portal.war to jetty in the test submodule.
 
@@ -83,7 +84,7 @@ to remove unneeded database specific configuration.
 The template uses the package name com.sybase365.mobiliser.custom.project
 throughout. You should change this to something relevant for your project.
 
-To ease this process, there is script included `rename_customisation.sh` which
+To ease this process, there is a script included, `rename_customisation.sh`, which
 can automatically rename the packages and artefacts in the project. Typical
 usage would be:
 
@@ -106,7 +107,7 @@ running the following command in the test module:
         mvn jetty:run-war -Djetty.port=8080 -Ddaemon=false
 
 Like with the 'it' profile, mobiliser will be deployed onto a jetty server and
-will use a derby database. If you haven enabled the customisation of the
+will use a derby database. If you have enabled the customisation of the
 Web-UI, it will also be deployed to jetty.
 
 If you are testing the example weather service and you need to use a proxy
