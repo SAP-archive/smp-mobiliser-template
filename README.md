@@ -1,7 +1,7 @@
 # Mobiliser Customisation Template
 
 This is the official customisation template for building server-side
-customisations on the Mobiliser Platform, version 5.5.1.
+customisations on the Mobiliser Platform, version 5.5.3.
 
 ## Prerequisites
 
@@ -16,18 +16,21 @@ beginning your customisation, checkout the matching branch.
 
 ## Getting Started
 
-Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP08. Then
-install the patch PL01 onto your installation. Mobiliser is packaged as an
-optional feature inside SMP. To begin work on your customisation, you need to
-install the mobiliser WAR file into your local maven repository so it can be
-used as a dependency of this project.
+Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP09.
+Mobiliser is packaged as an optional feature inside SMP. To begin work on your
+customisation, you need to install the mobiliser WAR file into your local maven
+repository so it can be used as a dependency of this project.
 
-PL01 does not include an updated mobiliser update-site. Instead, the patched
-5.5.1 mobiliser.war is included in the directory
-$SMP\_HOME/extras/mobiliser/custom/. Once you have located the war file,
-install it into your local repository.
+If the mobiliser feature is active in your SMP, you'll find the mobiliser WAR
+file in $SMP\_HOME/pickup. You can also extract the WAR file from the mobiliser
+feature without activating it. This can be done like this:
 
-        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.5.1 -Dpackaging=war
+        jar xf $SMP_HOME/p2/com.sap.mobile.platform.server.repository/binary/com.sap.mobile.platform.server.build.feature.mobiliser_root_* pickup/mobiliser.war && mv pickup/mobiliser.war . && rm -r pickup
+
+
+Once you have located the war file, install it into your local repository.
+
+        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.5.3 -Dpackaging=war
 
 ### Reporting Mobiliser
 
@@ -41,9 +44,6 @@ dist/pom.xml to have it included in your final WAR.
 
 ### Web-UI
 
-There were no changes to the portal.war for PL01, so follow the same procedure
-as for an unpatched SP08.
-
 If the mobiliser portal feature is active your SMP, you'll find the portal WAR
 file in $SMP\_HOME/pickup. You can also extract the WAR file from the portal
 feature without activating it. This can be done like this:
@@ -55,10 +55,10 @@ Once you have the war file, install it into your local repository.
         mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.5.0 -Dpackaging=war
 
 The example Web-UI sources are included in SMP in
-$SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.1-project.zip.
+$SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.3-project.zip.
 You can extract these into your customisation template like this:
 
-        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.1-project.zip src
+        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.3-project.zip src
 
 Run this from the web submodule to extract the src folder from the packaged zip
 file. You can then add the web module to the list of modules to build in
