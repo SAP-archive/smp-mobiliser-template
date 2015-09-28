@@ -39,6 +39,15 @@
               <artifactId>com.sybase365.mobiliser.vanilla.war</artifactId>
               <excludes>
                 <exclude>WEB-INF/osgi/derby/**</exclude>
+
+                <!-- CUSTOMISATION POINT - uncomment this section to enable JMS for channel mgr -->
+<!--
+                <exclude>WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.tools.jmsutils-*</exclude>
+                <exclude>WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmsconnection-*</exclude>
+                <exclude>WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmspickup-*</exclude>
+                <exclude>WEB-INF/osgi/bundles/99-disabled/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmsreceiver-*</exclude>
+                <exclude>WEB-INF/osgi/bundles/14-mobiliser-messaging/com.sybase365.mobiliser.util.messaging.channelmanager.engine.dummyreceiver*</exclude>
+-->
               </excludes>
             </overlay>
           </overlays>
@@ -227,6 +236,31 @@
                     <exclude name="META-INF/**/*" />
                   </patternset>
                 </unzip>
+-->
+
+                <!-- CUSTOMISATION POINT - uncomment this section to enable JMS for channel mgr -->
+<!--
+                <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/08-mobiliser-tools">
+                  <fileset dir="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled"
+                    includes="**/com.sybase365.mobiliser.util.tools.jmsutils-*.jar" />
+                </copy>
+
+                <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/14-mobiliser-messaging">
+                  <fileset dir="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled"
+                    includes="**/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmsconnection-*.jar" />
+                </copy>
+                <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/14-mobiliser-messaging">
+                  <fileset dir="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled"
+                    includes="**/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmspickup-*.jar" />
+                </copy>
+                <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/14-mobiliser-messaging">
+                  <fileset dir="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled"
+                    includes="**/com.sybase365.mobiliser.util.messaging.channelmanager.engine.jmsreceiver-*.jar" />
+                </copy>
+                <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/bundles/99-disabled">
+                  <fileset dir="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/14-mobiliser-messaging"
+                    includes="**/com.sybase365.mobiliser.util.messaging.channelmanager.engine.dummyreceiver-*.jar" />
+                </copy>
 -->
               </target>
             </configuration>
