@@ -116,6 +116,13 @@ jetty plugin:
 
         mvn jetty:run-war -Djetty.port=8080 -Ddaemon=false -Dhttp.proxyHost=myproxy -Dhttp.proxyPort=8080 -Dhttps.proxyHost=myproxy -Dhttps.proxyPort=8080
 
+### JMS Integration with Brand Mobiliser
+
+If you want to build your mobiliser.war with preconfigured JMS bundles for
+integration with Brand mobiliser, find the two `<-- CUSTOMISATION POINT` blocks
+in dist/pom.xml mentioning JMS and uncomment the relevant sections to activate
+packaging the JMS bundles.
+
 ## Getting Help
 
 Documentation for installation, administration, and developers can be found
