@@ -33,9 +33,9 @@ Examples
 EOF
 }
 
-# shellcheck disable=SC2078
+# shellcheck disable=SC2159
 while [ 0 ]; do
-  if [ "x$1" = "x-h" -o "x$1" = "x--help" ]; then
+  if [ "x$1" = "x-h" ] || [ "x$1" = "x--help" ]; then
     usage;
     exit 0
   else
@@ -75,9 +75,11 @@ find . -depth -name 'project' -type d \! -path '*/target/*' -print0 | xargs -0 -
 
 # update context.properties
 lowerdomain="$(echo "$package" | cut -d. -f2)"
-domain="$(echo "$lowerdomain" | cut -c1 | tr '[a-z]' '[A-Z]')$(echo "$lowerdomain" | cut -c2-)"
+# shellcheck disable=SC2018,SC2019
+domain="$(echo "$lowerdomain" | cut -c1 | tr 'a-z' 'A-Z')$(echo "$lowerdomain" | cut -c2-)"
 project="$(echo "$package" | rev | cut -d. -f1 | rev)"
-upperProject="$(echo "$project" | cut -c1 | tr '[a-z]' '[A-Z]')$(echo "$project" | cut -c2-)"
+# shellcheck disable=SC2018,SC2019
+upperProject="$(echo "$project" | cut -c1 | tr 'a-z' 'A-Z')$(echo "$project" | cut -c2-)"
 
 find . -name 'context.properties' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe "s#contextPath=custom#contextPath=$project#;s#wsdlName=Custom#wsdlName=$upperProject#;s#portTypeName=CustomSoapPort#portTypeName=$upperProject""SoapPort#;s#serviceName=CustomService#serviceName=$upperProject""Service#;s#jsClientName=customService#jsClientName=$project""Service#" "{}"
 
