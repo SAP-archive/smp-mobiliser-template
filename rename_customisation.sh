@@ -116,7 +116,7 @@ find . -name '*.xsd' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe 
 find . -name '*.xml' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe "s#/com/sybase365/mobiliser/custom/project/#/$directory/#g" "{}"
 
 # fix namespace in WSDLs
-find . -name 'context.properties' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe "s#namespace=http\\\\://mobiliser\.sybase365\.com/custom/project#http\\\\://$part1/$part2/#" "{}"
+find . -name 'context.properties' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe "s#namespace=http\\\\://mobiliser\.sybase365\.com/custom/project#namespace=http\\\\://$part1/$part2/#" "{}"
 
 # fix <name> in pom.xml
 find . -name 'pom.xml' \! -path '*/target/*' -print0 | xargs -0 -I {} perl -i -pe "s#AIMS Mobiliser :: Custom :: Project#AIMS Mobiliser :: $domain :: $upperProject#" "{}"
