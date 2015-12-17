@@ -52,7 +52,7 @@ feature without activating it. This can be done like this:
 
 Once you have the war file, install it into your local repository.
 
-        mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.5.0 -Dpackaging=war
+        mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.5.3 -Dpackaging=war
 
 The example Web-UI sources are included in SMP in
 $SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.3-project.zip.
