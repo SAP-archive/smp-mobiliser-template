@@ -46,25 +46,29 @@
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
 
-    <version.smp-mobiliser-war>5.5.3</version.smp-mobiliser-war>
-    <version.smp-portal-war>5.5.3</version.smp-portal-war>
-    <version.framework>5.5.3</version.framework>
-    <version.vanilla>5.5.3</version.vanilla>
-    <version.money>5.5.3</version.money>
-    <version.mbanking>1.5.3</version.mbanking>
-    <version.workflow>5.5.3</version.workflow>
-    <version.mobiliser-tools>5.5.3</version.mobiliser-tools>
-    <version.prefs>5.5.3</version.prefs>
-    <version.messaging>5.5.3</version.messaging>
-    <version.management>5.5.3</version.management>
-    <version.reports>5.5.3</version.reports>
-    <version.web>5.5.3</version.web>
-    <version.events>1.5.3</version.events>
+    <version.smp-mobiliser-war>5.5.4</version.smp-mobiliser-war>
+    <version.smp-portal-war>5.5.4</version.smp-portal-war>
+    <version.framework>5.5.4</version.framework>
+    <version.vanilla>5.5.4</version.vanilla>
+    <version.money>5.5.4</version.money>
+    <version.mbanking>1.5.4</version.mbanking>
+    <version.workflow>5.5.4</version.workflow>
+    <version.mobiliser-tools>5.5.4</version.mobiliser-tools>
+    <version.prefs>5.5.4</version.prefs>
+    <version.messaging>5.5.4</version.messaging>
+    <version.management>5.5.4</version.management>
+    <version.reports>5.5.4</version.reports>
+    <version.web>5.5.4</version.web>
+    <version.events>1.5.4</version.events>
     <version.brand>1.3.0</version.brand>
-    <version.dbmaintain>2.4.6.7-sap-03</version.dbmaintain>
+    <version.dbmaintain>2.4.6.7-sap-04</version.dbmaintain>
 
-    <version.reporting-mobiliser>5.5.0</version.reporting-mobiliser>
+    <version.reporting-mobiliser>5.5.4</version.reporting-mobiliser>
 
+    <version.springbase>3.2.14.RELEASE</version.springbase>
+    <version.spring>${version.springbase}_1</version.spring>
+    <version.springws>2.1.4.RELEASE</version.springws>
+    <version.springsec>3.2.8.RELEASE</version.springsec>
     <version.junit>4.8.1</version.junit>
     <version.derby>10.8.2.2_1</version.derby>
     <version.wicket>1.4.23</version.wicket>
@@ -232,11 +236,11 @@
               </goals>
             </execution>
             <!-- http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html -->
-            <!-- here we override the super-pom attach-sources executionid 
-              which calls sources:jar goal. That goals forks the lifecycle, causing the 
-              generate-sources phase to be called twice for the install goal. This causes 
-              any other plugin bound to the generate-sources phase to be called twice which 
-              usually has nasty side effects, let alone creating duplicate processing and 
+            <!-- here we override the super-pom attach-sources executionid
+              which calls sources:jar goal. That goals forks the lifecycle, causing the
+              generate-sources phase to be called twice for the install goal. This causes
+              any other plugin bound to the generate-sources phase to be called twice which
+              usually has nasty side effects, let alone creating duplicate processing and
               longer build times. -->
             <execution>
               <id>attach-sources</id>
@@ -245,7 +249,7 @@
           </executions>
           <configuration>
             <excludes>
-              <!-- Make sure generated JARs do not contain log4j configuration 
+              <!-- Make sure generated JARs do not contain log4j configuration
                 files -->
               <exclude>**/log4j.properties</exclude>
               <exclude>**/log4j.xml</exclude>
@@ -354,7 +358,7 @@
           </executions>
           <configuration>
             <excludes>
-              <!-- Make sure generated JARs do not contain log4j configuration 
+              <!-- Make sure generated JARs do not contain log4j configuration
                 files -->
               <exclude>**/log4j.properties</exclude>
               <exclude>**/log4j.xml</exclude>
@@ -376,7 +380,7 @@
             </archive>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
+        <!--This plugin's configuration is used to store Eclipse m2e settings
           only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -575,4 +579,3 @@
     </dependencies>
   </dependencyManagement>
 </project>
-
