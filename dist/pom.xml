@@ -275,18 +275,18 @@
               <target>
 
                 <exec dir="${project.build.directory}/derby/WEB-INF/osgi/derby" executable="java" taskname="dbmaintain-product" failonerror="true">
-                  <arg line="-jar"/>
-                  <arg line="${project.build.directory}/derby/WEB-INF/osgi/derby/com.sybase365.mobiliser.vanilla.standalone-${version.vanilla}-scriptarchive-derby.jar"/>
-                  <arg line="-c"/>
-                  <arg line="${basedir}/target/dbmaintain-derby/dbmaintain.properties.derby"/>
-                  <arg line="-clean"/>
+                  <arg value="-jar"/>
+                  <arg value="${project.build.directory}/derby/WEB-INF/osgi/derby/com.sybase365.mobiliser.vanilla.standalone-${version.vanilla}-scriptarchive-derby.jar"/>
+                  <arg value="-c"/>
+                  <arg value="${basedir}/target/dbmaintain-derby/dbmaintain.properties.derby"/>
+                  <arg value="-clean"/>
                 </exec>
 
                 <exec dir="${project.build.directory}/derby/WEB-INF/osgi/derby" executable="java" taskname="dbmaintain-custom" failonerror="true">
-                  <arg line="-jar"/>
-                  <arg line="${project.build.directory}/com.sybase365.mobiliser.custom.project.dist-${project.version}-scriptarchive-derby.jar"/>
-                  <arg line="-c"/>
-                  <arg line="${project.build.directory}/dbmaintain-derby/dbmaintain.properties.derby"/>
+                  <arg value="-jar"/>
+                  <arg value="${project.build.directory}/com.sybase365.mobiliser.custom.project.dist-${project.version}-scriptarchive-derby.jar"/>
+                  <arg value="-c"/>
+                  <arg value="${project.build.directory}/dbmaintain-derby/dbmaintain.properties.derby"/>
                 </exec>
 
                 <move file="${project.build.directory}/derby/WEB-INF/osgi/derby" tofile="${project.build.directory}/${project.build.finalName}/WEB-INF/osgi/derby"/>
