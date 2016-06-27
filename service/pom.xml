@@ -864,7 +864,7 @@
       <artifactId>com.springsource.org.hibernate</artifactId>
       <version>IGNORED</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.hibernate-3.3.2.GA-sap-06.jar</systemPath>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.org.hibernate-3.3.2.GA-sap-07.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -882,10 +882,10 @@
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
-      <artifactId>com.springsource.javax.annotation</artifactId>
+      <artifactId>javax.annotation</artifactId>
       <version>IGNORED</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/com.springsource.javax.annotation-1.0.0.jar</systemPath>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/javax.annotation-1.1.0.v201105051105.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>

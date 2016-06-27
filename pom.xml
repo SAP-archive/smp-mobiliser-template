@@ -46,29 +46,29 @@
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
 
-    <version.smp-mobiliser-war>5.5.4</version.smp-mobiliser-war>
-    <version.smp-portal-war>5.5.4</version.smp-portal-war>
-    <version.framework>5.5.4</version.framework>
-    <version.vanilla>5.5.4</version.vanilla>
-    <version.money>5.5.4</version.money>
-    <version.mbanking>1.5.4</version.mbanking>
-    <version.workflow>5.5.4</version.workflow>
-    <version.mobiliser-tools>5.5.4</version.mobiliser-tools>
-    <version.prefs>5.5.4</version.prefs>
-    <version.messaging>5.5.4</version.messaging>
-    <version.management>5.5.4</version.management>
-    <version.reports>5.5.4</version.reports>
-    <version.web>5.5.4</version.web>
-    <version.events>1.5.4</version.events>
+    <version.smp-mobiliser-war>5.5.6</version.smp-mobiliser-war>
+    <version.smp-portal-war>5.5.6</version.smp-portal-war>
+    <version.framework>5.5.6</version.framework>
+    <version.vanilla>5.5.6</version.vanilla>
+    <version.money>5.5.6</version.money>
+    <version.mbanking>1.5.6</version.mbanking>
+    <version.workflow>5.5.6</version.workflow>
+    <version.mobiliser-tools>5.5.6</version.mobiliser-tools>
+    <version.prefs>5.5.6</version.prefs>
+    <version.messaging>5.5.6</version.messaging>
+    <version.management>5.5.6</version.management>
+    <version.reports>5.5.6</version.reports>
+    <version.web>5.5.6</version.web>
+    <version.events>1.5.6</version.events>
     <version.brand>1.3.0</version.brand>
     <version.dbmaintain>2.4.6.7-sap-04</version.dbmaintain>
 
-    <version.reporting-mobiliser>5.5.4</version.reporting-mobiliser>
+    <version.reporting-mobiliser>5.5.6</version.reporting-mobiliser>
 
-    <version.springbase>3.2.14.RELEASE</version.springbase>
+    <version.springbase>3.2.16.RELEASE</version.springbase>
     <version.spring>${version.springbase}_1</version.spring>
     <version.springws>2.1.4.RELEASE</version.springws>
-    <version.springsec>3.2.8.RELEASE</version.springsec>
+    <version.springsec>3.2.9.RELEASE</version.springsec>
     <version.junit>4.8.1</version.junit>
     <version.derby>10.8.2.2_1</version.derby>
     <version.wicket>1.4.23</version.wicket>
