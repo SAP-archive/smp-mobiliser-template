@@ -37,7 +37,7 @@ Once you have located the war file, install it into your local repository.
 If you want to include Reporting Mobiliser in your customisation, download it
 from the software centre and install it like this:
 
-        mvn install:install-file -Dfile=com.sybase365.mobiliser.dist.full-5.5.6-reporting.zip -DgroupId=com.sap.mobile.platform.server.appservices.money.dist  -DartifactId=com.sybase365.mobiliser.dist.full -Dversion=5.5.6 -Dpackaging=zip -Dclassifier=reporting
+        mvn install:install-file -Dfile=com.sybase365.mobiliser.dist.full-5.5.4-reporting.zip -DgroupId=com.sap.mobile.platform.server.appservices.money.dist  -DartifactId=com.sybase365.mobiliser.dist.full -Dversion=5.5.4 -Dpackaging=zip -Dclassifier=reporting
 
 Then you will need to uncomment the section for reporting mobiliser in the
 dist/pom.xml to have it included in your final WAR.
