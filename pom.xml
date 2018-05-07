@@ -46,20 +46,20 @@
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
 
-    <version.smp-mobiliser-war>5.5.6</version.smp-mobiliser-war>
-    <version.smp-portal-war>5.5.6</version.smp-portal-war>
-    <version.framework>5.5.6</version.framework>
-    <version.vanilla>5.5.6</version.vanilla>
-    <version.money>5.5.6</version.money>
-    <version.mbanking>1.5.6</version.mbanking>
-    <version.workflow>5.5.6</version.workflow>
-    <version.mobiliser-tools>5.5.6</version.mobiliser-tools>
-    <version.prefs>5.5.6</version.prefs>
-    <version.messaging>5.5.6</version.messaging>
-    <version.management>5.5.6</version.management>
-    <version.reports>5.5.6</version.reports>
-    <version.web>5.5.6</version.web>
-    <version.events>1.5.6</version.events>
+    <version.smp-mobiliser-war>5.5.11</version.smp-mobiliser-war>
+    <version.smp-portal-war>5.5.11</version.smp-portal-war>
+    <version.framework>5.5.11</version.framework>
+    <version.vanilla>5.5.11</version.vanilla>
+    <version.money>5.5.11</version.money>
+    <version.mbanking>1.5.11</version.mbanking>
+    <version.workflow>5.5.11</version.workflow>
+    <version.mobiliser-tools>5.5.11</version.mobiliser-tools>
+    <version.prefs>5.5.11</version.prefs>
+    <version.messaging>5.5.11</version.messaging>
+    <version.management>5.5.11</version.management>
+    <version.reports>5.5.11</version.reports>
+    <version.web>5.5.11</version.web>
+    <version.events>1.5.11</version.events>
     <version.brand>1.3.0</version.brand>
     <version.dbmaintain>2.4.6.7-sap-04</version.dbmaintain>
 
