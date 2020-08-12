@@ -145,3 +145,10 @@ template. We are happy to consider adding new example customisations to the
 template if you think they might be of use to other customisation teams. If you
 are unsure, open a pull request with your changes and a discussion can take
 place as to whether it makes sense to add it to the template.
+
+### Developer Certificate of Origin (DCO)
+
+Due to legal reasons, contributors will be asked to accept a DCO before they
+submit the first pull request to this project. This happens in an automated
+fashion during the submission process. SAP uses [the standard DCO text of the
+Linux Foundation](https://developercertificate.org).
