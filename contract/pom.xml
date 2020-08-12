@@ -187,7 +187,7 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>IGNORED</version>
+      <version>4.2.17.RELEASE</version>
       <scope>system</scope>
       <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/spring-security-core-${version.springsec}.jar</systemPath>
     </dependency>
