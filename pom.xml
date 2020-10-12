@@ -52,7 +52,7 @@
     <version.spring>${version.springbase}_1</version.spring>
     <version.springws>2.1.4.RELEASE</version.springws>
     <version.springsec>3.2.9.RELEASE</version.springsec>
-    <version.junit>4.8.1</version.junit>
+    <version.junit>4.13.1</version.junit>
     <version.derby>10.8.2.2_1</version.derby>
     <version.wicket>1.4.23</version.wicket>
     <version.slf4j>1.6.1</version.slf4j>
