@@ -32,7 +32,8 @@
 	<osgi:reference id="sessionFactory">
 		<osgi:interfaces>
 			<value>org.hibernate.SessionFactory</value>
-			<value>org.hibernate.engine.SessionFactoryImplementor</value>
+			<value>org.hibernate.engine.spi.SessionFactoryImplementor</value>
+			<value>javax.persistence.EntityManagerFactory</value>
 		</osgi:interfaces>
 	</osgi:reference>
 

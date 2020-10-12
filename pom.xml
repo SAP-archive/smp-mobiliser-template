@@ -20,42 +20,49 @@
     <!-- This is interpreted as decimal, cf. MASSEMBLY-494 -->
     <mobDefaultDirectoryMode>493</mobDefaultDirectoryMode>
     <version.java>1.7</version.java>
+    <surefire.forkcount>1</surefire.forkcount>
+    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <version.maven-javadoc-plugin>2.7</version.maven-javadoc-plugin>
     <version.maven-compiler-plugin>2.3.2</version.maven-compiler-plugin>
+    <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
     <manifest.name>com/sybase365/mobiliser/custom/project</manifest.name>
     <manifest.title>Sybase365 Mobiliser Customization Project</manifest.title>
     <manifest.spec-version>1.0.0</manifest.spec-version>
 
-    <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-    <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
-
-    <version.smp-mobiliser-war>5.5.11</version.smp-mobiliser-war>
-    <version.smp-portal-war>5.5.11</version.smp-portal-war>
-    <version.framework>5.5.11</version.framework>
-    <version.vanilla>5.5.11</version.vanilla>
-    <version.money>5.5.11</version.money>
-    <version.mbanking>1.5.11</version.mbanking>
-    <version.workflow>5.5.11</version.workflow>
-    <version.mobiliser-tools>5.5.11</version.mobiliser-tools>
-    <version.prefs>5.5.11</version.prefs>
-    <version.messaging>5.5.11</version.messaging>
-    <version.management>5.5.11</version.management>
-    <version.reports>5.5.11</version.reports>
-    <version.web>5.5.11</version.web>
-    <version.events>1.5.11</version.events>
+    <version.smp-mobiliser-war>5.6.10</version.smp-mobiliser-war>
+    <version.smp-portal-war>5.6.10</version.smp-portal-war>
+    <version.framework>5.6.10</version.framework>
+    <version.vanilla>5.6.10</version.vanilla>
+    <version.money>5.6.10</version.money>
+    <version.mbanking>1.6.10</version.mbanking>
+    <version.workflow>5.6.10</version.workflow>
+    <version.mobiliser-tools>5.6.10</version.mobiliser-tools>
+    <version.prefs>5.6.10</version.prefs>
+    <version.messaging>5.6.10</version.messaging>
+    <version.management>5.6.10</version.management>
+    <version.reports>5.6.10</version.reports>
+    <version.web>5.6.10</version.web>
+    <version.events>1.6.10</version.events>
     <version.brand>1.3.0</version.brand>
-    <version.dbmaintain>2.4.6.7-sap-04</version.dbmaintain>
+    <version.dbmaintain>2.4.6.7-sap-07</version.dbmaintain>
 
-    <version.reporting-mobiliser>5.5.4</version.reporting-mobiliser>
+    <version.reporting-mobiliser>5.6.10</version.reporting-mobiliser>
 
-    <version.springbase>3.2.16.RELEASE</version.springbase>
+    <version.springbase>5.3.0</version.springbase>
     <version.spring>${version.springbase}_1</version.spring>
-    <version.springws>2.1.4.RELEASE</version.springws>
-    <version.springsec>3.2.9.RELEASE</version.springsec>
-    <version.junit>4.8.1</version.junit>
-    <version.derby>10.8.2.2_1</version.derby>
+    <version.springwsbase>3.0.10.RELEASE</version.springwsbase>
+    <version.springws>${version.springwsbase}_1</version.springws>
+    <version.springsecbase>5.4.1</version.springsecbase>
+    <version.springsec>${version.springsecbase}_1</version.springsec>
+    <version.junit>4.13.1</version.junit>
+    <version.derby>10.14.2.0</version.derby>
     <version.wicket>1.4.23</version.wicket>
-    <version.slf4j>1.6.1</version.slf4j>
+    <version.slf4j>1.7.30</version.slf4j>
+    <version.httpclient>4.5.13</version.httpclient>
+    <version.httpcore>4.4.14</version.httpcore>
+    <version.jackson>2.11.2</version.jackson>
+    <version.hibernate>5.4.29.Final</version.hibernate>
+    <version.hibernate.annotations>5.1.2.Final</version.hibernate.annotations>
 
     <!-- CUSTOMISATION POINT - set to false to customise the webui -->
     <webui.disabled>true</webui.disabled>
@@ -64,8 +71,8 @@
 
   <!-- TODO: CUSTOMISATION POINT
   <scm>
-    <connection>scm:git:https://github.com/SAP/smp_mobiliser_template.git</connection>
-    <developerConnection>scm:git:https://github.com/SAP/smp_mobiliser_template.git</developerConnection>
+    <connection>scm:git:https://github.com/SAP-templates/smp_mobiliser_template.git</connection>
+    <developerConnection>scm:git:https://github.com/SAP-templates/smp_mobiliser_template.git</developerConnection>
   </scm>
     -->
 
@@ -115,7 +122,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.3.7</version>
+          <version>5.1.1</version>
           <extensions>true</extensions>
           <configuration>
             <obrRepository>NONE</obrRepository>
@@ -123,7 +130,7 @@
               <Bundle-Name>${project.name}</Bundle-Name>
               <Bundle-Version>${project.version}</Bundle-Version>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-              <_snapshot>${osgi-version-qualifier}</_snapshot>
+              <_snapshot>${maven.build.timestamp}</_snapshot>
             </instructions>
           </configuration>
         </plugin>
@@ -158,15 +165,6 @@
           <version>2.5</version>
           <configuration>
             <updateReleaseInfo>true</updateReleaseInfo>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-eclipse-plugin</artifactId>
-          <version>2.8</version>
-          <configuration>
-            <ajdtVersion>none</ajdtVersion>
-            <buildOutputDirectory>build</buildOutputDirectory>
           </configuration>
         </plugin>
         <plugin>
@@ -232,31 +230,30 @@
           </executions>
           <configuration>
             <excludes>
-              <!-- Make sure generated JARs do not contain log4j configuration
+              <!-- Make sure generated JARs do not contain logging configuration
                 files -->
               <exclude>**/log4j.properties</exclude>
               <exclude>**/log4j.xml</exclude>
+              <exclude>**/logback.xml</exclude>
+              <exclude>**/logback-test.xml</exclude>
             </excludes>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12</version>
+          <version>${version.maven-surefire-plugin}</version>
           <dependencies>
             <dependency>
               <groupId>org.apache.maven.surefire</groupId>
               <artifactId>surefire-junit47</artifactId>
-              <version>2.12</version>
+              <version>${version.maven-surefire-plugin}</version>
             </dependency>
           </dependencies>
           <configuration>
-            <forkMode>never</forkMode>
-            <!-- TODO: Hack to avoid OverlappingFileException: http://jira.codehaus.org/browse/SONAR-172 -->
-            <systemPropertyVariables>
-              <cobertura.use.java.nio>false</cobertura.use.java.nio>
-            </systemPropertyVariables>
-            <!-- End hack -->
+            <forkCount>${surefire.forkcount}</forkCount>
+            <reuseForks>true</reuseForks>
+            <junitArtifactName>junit:junit</junitArtifactName>
           </configuration>
         </plugin>
         <plugin>
@@ -292,9 +289,9 @@
           <version>1.7</version>
         </plugin>
         <plugin>
-          <groupId>com.sun.tools.xjc.maven2</groupId>
-          <artifactId>maven-jaxb-plugin</artifactId>
-          <version>1.1.1</version>
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb22-plugin</artifactId>
+          <version>0.14.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -304,23 +301,6 @@
             </execution>
           </executions>
           <dependencies>
-            <!-- configure the correct versions of jaxb api and impl -->
-            <dependency>
-              <groupId>org.apache.servicemix.bundles</groupId>
-              <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId>
-              <version>2.2.4_1</version>
-              <scope>runtime</scope>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.servicemix.bundles</groupId>
-              <artifactId>org.apache.servicemix.bundles.jaxb-xjc</artifactId>
-              <version>2.2.4_1</version>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.servicemix.specs</groupId>
-              <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
-              <version>1.9.0</version>
-            </dependency>
             <dependency>
               <groupId>org.jvnet.jaxb2_commons</groupId>
               <artifactId>jaxb2-basics-annotate</artifactId>
@@ -341,10 +321,12 @@
           </executions>
           <configuration>
             <excludes>
-              <!-- Make sure generated JARs do not contain log4j configuration
+              <!-- Make sure generated JARs do not contain logging configuration
                 files -->
               <exclude>**/log4j.properties</exclude>
               <exclude>**/log4j.xml</exclude>
+              <exclude>**/logback.xml</exclude>
+              <exclude>**/logback-test.xml</exclude>
             </excludes>
             <archive>
               <manifestSections>
@@ -361,101 +343,6 @@
                 </manifestSection>
               </manifestSections>
             </archive>
-          </configuration>
-        </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <versionRange>[1.7,)</versionRange>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>false</runOnIncremental>
-                      <runOnConfiguration>true</runOnConfiguration>
-                    </execute>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.3,)</versionRange>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                      <goal>unpack</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>false</runOnIncremental>
-                      <runOnConfiguration>true</runOnConfiguration>
-                    </execute>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.sun.tools.xjc.maven2</groupId>
-                    <artifactId>maven-jaxb-plugin</artifactId>
-                    <versionRange>[1.1.1,)</versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>true</runOnIncremental>
-                      <runOnConfiguration>true</runOnConfiguration>
-                    </execute>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <versionRange>[2.3.7,)</versionRange>
-                    <goals>
-                      <goal>bundle</goal>
-                      <goal>manifest</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>true</runOnIncremental>
-                      <runOnConfiguration>true</runOnConfiguration>
-                    </execute>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>jaxws-maven-plugin</artifactId>
-                    <versionRange>[1.12,)</versionRange>
-                    <goals>
-                      <goal>wsimport</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>false</runOnIncremental>
-                      <runOnConfiguration>true</runOnConfiguration>
-                    </execute>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
           </configuration>
         </plugin>
         <plugin>
@@ -503,8 +390,18 @@
         <version>2.1-b16</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>${version.derby}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbyclient</artifactId>
+        <version>${version.derby}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbynet</artifactId>
         <version>${version.derby}</version>
       </dependency>
       <dependency>
@@ -520,8 +417,8 @@
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.4</version>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -531,23 +428,18 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${version.slf4j}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${version.slf4j}</version>
       </dependency>
       <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-minimal</artifactId>
-        <version>2.7.15</version>
+        <version>2.7.18</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>

@@ -60,6 +60,7 @@
               org.springframework.ws.soap.server.endpoint,
               org.springframework.ws.wsdl.wsdl11,
               org.springframework.ws.transport,
+              org.springframework.security.core,
               org.springframework.security.web.authentication,
               org.springframework.security.authentication,
               org.springframework.security.web.authentication.www,
@@ -73,11 +74,13 @@
               org.aspectj.weaver.reflect,
               org.springframework.aop.framework,
               org.springframework.aop,
+              org.springframework.core,
+              org.springframework.expression,
               org.aopalliance.aop,
               org.springframework.aop.aspectj.autoproxy,
-              javax.servlet;version="[2.4.0, 3.0.0]",
-              javax.servlet.http;version="[2.4.0, 3.0.0]",
-              javax.servlet.resources;version="[2.4.0, 3.0.0]",
+              javax.servlet;version="[2.4.0, 4.0.0]",
+              javax.servlet.http;version="[2.4.0, 4.0.0]",
+              javax.servlet.resources;version="[2.4.0, 4.0.0]",
               *
             </Import-Package>
           </instructions>

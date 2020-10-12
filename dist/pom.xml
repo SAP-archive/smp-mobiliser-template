@@ -96,14 +96,28 @@
                 </move>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-derby">
                   <patternset>
                     <exclude name="META-INF/**/*" />
                   </patternset>
                 </unzip>
                 <unzip
-                  src="${org.apache.servicemix.bundles:org.apache.servicemix.bundles.derby:jar}"
+                  src="${org.apache.derby:derby:jar}"
+                  dest="${basedir}/target/dbmaintain-derby">
+                  <patternset>
+                    <exclude name="META-INF/**/*,OSGI-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${org.apache.derby:derbynet:jar}"
+                  dest="${basedir}/target/dbmaintain-derby">
+                  <patternset>
+                    <exclude name="META-INF/**/*,OSGI-INF/**/*" />
+                  </patternset>
+                </unzip>
+                <unzip
+                  src="${org.apache.derby:derbyclient:jar}"
                   dest="${basedir}/target/dbmaintain-derby">
                   <patternset>
                     <exclude name="META-INF/**/*,OSGI-INF/**/*" />
@@ -119,7 +133,7 @@
 
                 <!-- CUSTOMISATION POINT - leave only the database variant you will be using here -->
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-anywhere">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -134,7 +148,7 @@
                 </unzip>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-ase">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -149,7 +163,7 @@
                 </unzip>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-db2">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -164,7 +178,7 @@
                 </unzip>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-hdb">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -179,7 +193,7 @@
                 </unzip>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-mssql">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -194,7 +208,7 @@
                 </unzip>
 
                 <unzip
-                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/dbmaintainSybase-${version.dbmaintain}.jar"
+                  src="${basedir}/../repo/target/war/WEB-INF/osgi/bundles/99-disabled/org.dbmaintain.dbmaintainsybase-${version.dbmaintain}.jar"
                   dest="${basedir}/target/dbmaintain-oracle">
                   <patternset>
                     <exclude name="META-INF/**/*" />
@@ -540,8 +554,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbynet</artifactId>
       <scope>provided</scope>
     </dependency>
     <!-- REPORTING MOBILISER INTEGRATION -->
