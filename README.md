@@ -1,3 +1,5 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/smp-mobiliser-template)](https://api.reuse.software/info/github.com/SAP-samples/smp-mobiliser-template)
+
 # Mobiliser Customisation Template
 
 This is the official customisation template for building server-side
