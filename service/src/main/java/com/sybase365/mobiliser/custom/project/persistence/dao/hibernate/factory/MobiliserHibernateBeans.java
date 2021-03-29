@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.util.ConfigHelper;
 
 import com.sybase365.mobiliser.custom.project.persistence.model.Blacklist;
 import com.sybase365.mobiliser.custom.project.persistence.model.BlacklistType;
@@ -64,8 +63,7 @@ public class MobiliserHibernateBeans implements PersistenceServiceProvider {
 
     @Override
     public String getEhCacheConfigurationFileName() {
-	return ConfigHelper.findAsResource(this.ehCacheConfigurationFileName)
-		.toExternalForm();
+	return getClass().getClassLoader().getResource(this.ehCacheConfigurationFileName).toExternalForm();
     }
 
     /**

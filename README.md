@@ -2,12 +2,12 @@
 # Mobiliser Customisation Template
 
 This is the official customisation template for building server-side
-customisations on the Mobiliser Platform, version 5.5.11 (SMP SP14).
+customisations on the Mobiliser Platform, version 5.6.11 (SMP 3.1 SP0 PL6).
 
 ## Prerequisites
 
-JDK >= 1.7
-Maven >= 3.0.5
+JDK = 1.8
+Maven >= 3.6.3
 
 ## Versioning
 
@@ -17,7 +17,7 @@ beginning your customisation, checkout the matching branch.
 
 ## Getting Started
 
-Obtain and install your copy of the SAP Mobile Platform, version 3.0 SP14.
+Obtain and install your copy of the SAP Mobile Platform, version 3.1 SP0 PL6.
 Mobiliser is packaged as an optional feature inside SMP. To begin work on your
 customisation, you need to install the mobiliser WAR file into your local maven
 repository so it can be used as a dependency of this project.
@@ -31,14 +31,14 @@ feature without activating it. This can be done like this:
 
 Once you have located the war file, install it into your local repository.
 
-        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.5.11 -Dpackaging=war
+        mvn install:install-file -Dfile=mobiliser.war -DgroupId=com.sap.mobile.platform.server.appservices.money.vanilla  -DartifactId=com.sybase365.mobiliser.vanilla.war -Dversion=5.6.11 -Dpackaging=war
 
 ### Reporting Mobiliser
 
 If you want to include Reporting Mobiliser in your customisation, download it
 from the software centre and install it like this:
 
-        mvn install:install-file -Dfile=com.sybase365.mobiliser.dist.full-5.5.4-reporting.zip -DgroupId=com.sap.mobile.platform.server.appservices.money.dist  -DartifactId=com.sybase365.mobiliser.dist.full -Dversion=5.5.4 -Dpackaging=zip -Dclassifier=reporting
+        mvn install:install-file -Dfile=com.sybase365.mobiliser.dist.full-5.6.11-reporting.zip -DgroupId=com.sap.mobile.platform.server.appservices.money.dist  -DartifactId=com.sybase365.mobiliser.dist.full -Dversion=5.6.11 -Dpackaging=zip -Dclassifier=reporting
 
 Then you will need to uncomment the section for reporting mobiliser in the
 dist/pom.xml to have it included in your final WAR.
@@ -53,13 +53,13 @@ feature without activating it. This can be done like this:
 
 Once you have the war file, install it into your local repository.
 
-        mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.5.11 -Dpackaging=war
+        mvn install:install-file -Dfile=portal.war -DgroupId=com.sap.mobile.platform.server.appservices.money.web -DartifactId=com.sybase365.mobiliser.ui.web.application -Dversion=5.6.11 -Dpackaging=war
 
 The example Web-UI sources are included in SMP in
-$SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.11-project.zip.
+$SMP\_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.6.11-project.zip.
 You can extract these into your customisation template like this:
 
-        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.5.11-project.zip src
+        jar xf $SMP_HOME/extras/mobiliser/custom/com.sybase365.mobiliser.ui.web.application-5.6.11-project.zip src
 
 Run this from the web submodule to extract the src folder from the packaged zip
 file. You can then add the web module to the list of modules to build in

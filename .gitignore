@@ -1,4 +1,7 @@
+.classpath
+.project
 .repository
+.settings
 contract/src/main/resources/com/sybase365/mobiliser/framework/
 contract/src/main/resources/com/sybase365/mobiliser/money/
 target

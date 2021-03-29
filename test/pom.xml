@@ -11,7 +11,7 @@
   <name>AIMS Mobiliser :: Custom :: Project Test</name>
   <packaging>pom</packaging>
   <properties>
-    <version.jetty-maven-plugin>9.2.12.v20150709</version.jetty-maven-plugin>
+    <version.jetty-maven-plugin>9.4.38.v20210224</version.jetty-maven-plugin>
   </properties>
   <build>
     <plugins>
@@ -141,6 +141,7 @@
           <stopPort>${jetty.stop-port}</stopPort>
           <jettyXml>${basedir}/config/jetty-webui-disabled-${webui.disabled}.xml</jettyXml>
           <war>${project.build.directory}/jetty-war/mobiliser.war</war>
+          <supportedPackagings>pom</supportedPackagings>
           <systemProperties>
             <systemProperty>
               <name>derby.database</name>
@@ -196,7 +197,7 @@
               <value>development</value>
             </systemProperty>
             <systemProperty>
-              <name>log4j.logfiles.path</name>
+              <name>logback.logfiles.path</name>
               <value>${project.build.directory}/portal-logs</value>
             </systemProperty>
             <systemProperty>
@@ -221,14 +222,24 @@
             </systemProperty>
             <systemProperty>
               <name>com.sybase365.mobiliser.ui.web.logging.filename</name>
-              <value>web-ui_log4j.xml</value>
+              <value>web-ui_logback.xml</value>
             </systemProperty>
           </systemProperties>
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${version.derby}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>${version.derby}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbynet</artifactId>
             <version>${version.derby}</version>
           </dependency>
         </dependencies>
@@ -289,8 +300,18 @@
             </executions>
             <dependencies>
               <dependency>
-                <groupId>org.apache.servicemix.bundles</groupId>
-                <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${version.derby}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyclient</artifactId>
+                <version>${version.derby}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbynet</artifactId>
                 <version>${version.derby}</version>
               </dependency>
             </dependencies>

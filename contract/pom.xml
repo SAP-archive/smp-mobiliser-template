@@ -99,8 +99,8 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.sun.tools.xjc.maven2</groupId>
-        <artifactId>maven-jaxb-plugin</artifactId>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb22-plugin</artifactId>
         <executions>
           <!-- generate the files. -->
           <execution>
@@ -110,9 +110,9 @@
           </execution>
         </executions>
         <configuration>
-          <includeSchemas>
-            <includeSchema>**/*.xsd</includeSchema>
-          </includeSchemas>
+          <schemaIncludes>
+            <include>**/*.xsd</include>
+          </schemaIncludes>
           <verbose>true</verbose>
           <extension>true</extension>
         </configuration>
@@ -179,17 +179,17 @@
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation</artifactId>
+      <artifactId>javax.annotation-api</artifactId>
       <version>IGNORED</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/javax.annotation-1.1.0.v201105051105.jar</systemPath>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/javax.annotation-api-1.3.2.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.spring-security-core</artifactId>
       <version>IGNORED</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/spring-security-core-${version.springsec}.jar</systemPath>
+      <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/org.apache.servicemix.bundles.spring-security-core-${version.springsec}.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
