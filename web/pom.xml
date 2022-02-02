@@ -377,15 +377,6 @@
       <version>${version.springbase}</version>
     </dependency>
 
-    <!-- H2 Database for Operations Dashboad data storage -->
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.3.169</version>
-      <scope>compile</scope>
-    </dependency>
-
     <!-- EHCACHE DEPENDENCIES -->
     <dependency>
       <groupId>org.ehcache</groupId>
