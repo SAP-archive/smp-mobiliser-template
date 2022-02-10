@@ -848,7 +848,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>IGNORED</version>
+      <version>5.4.24.Final</version>
       <scope>system</scope>
       <systemPath>${basedir}/../repo/target/war/WEB-INF/osgi/bundles/07-frameworks/hibernate-core-${version.hibernate}.jar</systemPath>
     </dependency>
