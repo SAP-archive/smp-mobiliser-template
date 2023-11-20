@@ -55,7 +55,7 @@
     <version.springsecbase>5.4.1</version.springsecbase>
     <version.springsec>${version.springsecbase}_1</version.springsec>
     <version.junit>4.13.1</version.junit>
-    <version.derby>10.14.2.0</version.derby>
+    <version.derby>10.17.1.0</version.derby>
     <version.wicket>1.4.23</version.wicket>
     <version.slf4j>1.7.30</version.slf4j>
     <version.httpclient>4.5.13</version.httpclient>
