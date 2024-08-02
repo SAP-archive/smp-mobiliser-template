@@ -1,3 +1,11 @@
+## Deprecation Notice
+
+This public repository is read-only and no longer maintained.
+
+![](https://img.shields.io/badge/STATUS-NOT%20CURRENTLY%20MAINTAINED-red.svg?longCache=true&style=flat)
+
+---
+
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/smp-mobiliser-template)](https://api.reuse.software/info/github.com/SAP-samples/smp-mobiliser-template)
 # Mobiliser Customisation Template
 
