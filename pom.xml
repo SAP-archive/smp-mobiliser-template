@@ -210,12 +210,6 @@
           <artifactId>maven-source-plugin</artifactId>
           <version>2.1.2</version>
           <executions>
-            <execution>
-              <phase>verify</phase>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
-            </execution>
             <!-- http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html -->
             <!-- here we override the super-pom attach-sources executionid
               which calls sources:jar goal. That goals forks the lifecycle, causing the
